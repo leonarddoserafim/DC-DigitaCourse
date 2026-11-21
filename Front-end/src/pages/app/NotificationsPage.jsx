@@ -135,7 +135,7 @@ export default function NotificationsPage() {
                 </span>
                 <p>
                   <strong>Lembretes por e-mail</strong>
-                  {prefs.emailReminders ? 'Ativados' : 'Desativados'} nesta conta local.
+                  {prefs.emailReminders ? 'Ativados' : 'Desativados'} na sua conta.
                 </p>
               </li>
               <li>
@@ -164,7 +164,8 @@ export default function NotificationsPage() {
           </section>
 
           <p className="notifications-note" data-reveal>
-            Nesta etapa, as notificações são geradas localmente. Nenhum e-mail é enviado de verdade.
+            As notificações são persistidas no PostgreSQL. O envio real de e-mail ainda não está
+            habilitado.
           </p>
         </aside>
       </div>

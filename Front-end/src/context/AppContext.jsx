@@ -1,6 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
-import { courses, getCourse, getLesson } from '../data/courses'
-import { DEMO_EMAIL, createDemoAccount, createEmptyAccount } from '../data/seed'
+import { courses as fallbackCourses } from '../data/courses'
+import { api, ApiError, clearToken, getToken, storeToken } from '../lib/api'
 import {
   buildAchievements,
   buildChallenges,
@@ -12,121 +12,90 @@ import {
   sortAttempts,
 } from '../lib/metrics'
 
-const ACCOUNTS_KEY = 'digitacourse:accounts:v1'
-const SESSION_KEY = 'digitacourse:session:v1'
 const AppContext = createContext(null)
 
-function readAccounts() {
-  try {
-    const raw = window.localStorage.getItem(ACCOUNTS_KEY)
-    if (raw) {
-      const parsed = JSON.parse(raw)
-      if (parsed && typeof parsed === 'object' && Object.keys(parsed).length) return parsed
-    }
-  } catch {
-    // Storage may be unavailable; the app still works in memory.
-  }
-
-  const demo = createDemoAccount()
-  return { demo }
-}
-
-function readSession() {
-  try {
-    const raw = window.localStorage.getItem(SESSION_KEY)
-    if (!raw) return null
-    const parsed = JSON.parse(raw)
-    return parsed?.userId ? parsed : null
-  } catch {
-    return null
-  }
-}
-
-function persist(key, value) {
-  try {
-    if (value === null) window.localStorage.removeItem(key)
-    else window.localStorage.setItem(key, JSON.stringify(value))
-  } catch {
-    // Ignore storage failures in the prototype.
-  }
-}
-
-function createId(prefix) {
-  if (typeof crypto !== 'undefined' && crypto.randomUUID) return `${prefix}-${crypto.randomUUID()}`
-  return `${prefix}-${Date.now()}`
+function errorMessage(error) {
+  if (error instanceof ApiError) return error.message
+  return 'Não foi possível concluir a operação. Tente novamente.'
 }
 
 export function AppProvider({ children }) {
-  const [accounts, setAccounts] = useState(readAccounts)
-  const [session, setSession] = useState(readSession)
+  const [catalog, setCatalog] = useState(fallbackCourses)
+  const [account, setAccount] = useState(null)
+  const [authReady, setAuthReady] = useState(false)
 
   useEffect(() => {
-    persist(ACCOUNTS_KEY, accounts)
-  }, [accounts])
+    let active = true
 
-  useEffect(() => {
-    persist(SESSION_KEY, session)
-  }, [session])
-
-  const account = session ? accounts[session.userId] ?? null : null
-  const isAuthenticated = Boolean(account)
-
-  useEffect(() => {
-    if (session && !accounts[session.userId]) setSession(null)
-  }, [accounts, session])
-
-  const updateCurrentAccount = useCallback(
-    (updater) => {
-      if (!session?.userId) return
-      setAccounts((current) => {
-        const existing = current[session.userId]
-        if (!existing) return current
-        return { ...current, [session.userId]: updater(existing) }
+    api
+      .getCatalog()
+      .then((data) => {
+        if (active && Array.isArray(data) && data.length > 0) setCatalog(data)
       })
-    },
-    [session],
-  )
+      .catch(() => {
+        // The public site can still render with the bundled catalog while the API is offline.
+      })
+
+    if (!getToken()) {
+      setAuthReady(true)
+      return () => {
+        active = false
+      }
+    }
+
+    api
+      .me()
+      .then((data) => {
+        if (active) setAccount(data)
+      })
+      .catch((error) => {
+        if (error instanceof ApiError && error.status === 401) {
+          clearToken()
+        }
+      })
+      .finally(() => {
+        if (active) setAuthReady(true)
+      })
+
+    return () => {
+      active = false
+    }
+  }, [])
+
+  const applySession = useCallback((session) => {
+    storeToken(session.token)
+    setAccount(session.account)
+    setAuthReady(true)
+  }, [])
 
   const login = useCallback(
-    (email, password) => {
+    async (email, password) => {
       const normalized = email.trim().toLowerCase()
       if (!normalized || !password) {
         return { ok: false, error: 'Preencha o e-mail e a senha.' }
       }
-      if (password.length < 4) {
-        return { ok: false, error: 'A senha precisa ter pelo menos 4 caracteres.' }
-      }
 
-      const found = Object.values(accounts).find(
-        (item) => item.user.email.toLowerCase() === normalized,
-      )
-      if (!found) {
-        return {
-          ok: false,
-          error: 'Não encontramos uma conta com este e-mail. Crie uma conta para continuar.',
-        }
+      try {
+        applySession(await api.login({ email: normalized, password }))
+        return { ok: true }
+      } catch (error) {
+        return { ok: false, error: errorMessage(error) }
       }
-
-      setSession({ userId: found.user.id, signedInAt: new Date().toISOString() })
-      return { ok: true }
     },
-    [accounts],
+    [applySession],
   )
 
-  const loginDemo = useCallback(() => {
-    let demo = Object.values(accounts).find(
-      (item) => item.user.email.toLowerCase() === DEMO_EMAIL,
-    )
-    if (!demo) {
-      demo = createDemoAccount()
-      setAccounts((current) => ({ ...current, demo: demo }))
+  const loginDemo = useCallback(async () => {
+    try {
+      applySession(await api.demoLogin())
+      return { ok: true }
+    } catch (error) {
+      return { ok: false, error: errorMessage(error) }
     }
-    setSession({ userId: demo.user.id, signedInAt: new Date().toISOString() })
-    return { ok: true }
-  }, [accounts])
+  }, [applySession])
 
   const signup = useCallback(
-    ({ name, email, password }) => {
+    async ({ name, email, password }) => {
       const cleanName = name.trim()
       const normalized = email.trim().toLowerCase()
 
@@ -139,134 +108,142 @@ export function AppProvider({ children }) {
       if (password.length < 6) {
         return { ok: false, error: 'A senha precisa ter pelo menos 6 caracteres.' }
       }
-      if (Object.values(accounts).some((item) => item.user.email.toLowerCase() === normalized)) {
-        return { ok: false, error: 'Já existe uma conta com este e-mail. Faça login.' }
-      }
 
-      const id = createId('user')
-      const newAccount = createEmptyAccount({ id, name: cleanName, email: normalized })
-      setAccounts((current) => ({ ...current, [id]: newAccount }))
-      setSession({ userId: id, signedInAt: new Date().toISOString() })
-      return { ok: true }
+      try {
+        applySession(await api.signup({ name: cleanName, email: normalized, password }))
+        return { ok: true }
+      } catch (error) {
+        return { ok: false, error: errorMessage(error) }
+      }
     },
-    [accounts],
+    [applySession],
   )
 
   const logout = useCallback(() => {
-    setSession(null)
+    clearToken()
+    setAccount(null)
+    setAuthReady(true)
   }, [])
 
-  const updateProfile = useCallback(
-    ({ name, prefs }) => {
-      updateCurrentAccount((current) => ({
-        ...current,
-        user: name ? { ...current.user, name: name.trim() } : current.user,
-        prefs: prefs ? { ...current.prefs, ...prefs } : current.prefs,
-      }))
-    },
-    [updateCurrentAccount],
-  )
+  const updateProfile = useCallback(async ({ name, prefs }) => {
+    try {
+      setAccount(
+        await api.updateProfile({
+          name,
+          dailyGoalMinutes: prefs?.dailyGoalMinutes,
+          publicProfile: prefs?.publicProfile,
+          emailReminders: prefs?.emailReminders,
+          weeklySummary: prefs?.weeklySummary,
+        }),
+      )
+      return { ok: true }
+    } catch (error) {
+      return { ok: false, error: errorMessage(error) }
+    }
+  }, [])
 
-  const recordAttempt = useCallback(
-    (lesson, result) => {
-      const attempt = {
-        id: createId('attempt'),
-        lessonId: lesson.id,
-        lessonTitle: lesson.title,
-        courseId: lesson.courseId,
-        courseTitle: lesson.courseTitle,
-        wpm: Math.max(0, Math.round(result.wpm)),
-        accuracy: Math.max(0, Math.min(100, Number(result.accuracy.toFixed(1)))),
-        durationSeconds: Math.max(1, Math.round(result.durationSeconds)),
-        characters: lesson.text.length,
-        errors: result.errors,
-        xp: result.xp,
-        createdAt: new Date().toISOString(),
-      }
+  const recordAttempt = useCallback(async (lesson, result) => {
+    const payload = {
+      wpm: Math.max(0, Math.round(result.wpm)),
+      accuracy: Math.max(0, Math.min(100, Number(result.accuracy.toFixed(1)))),
+      durationSeconds: Math.max(1, Math.round(result.durationSeconds)),
+      errors: Math.max(0, Math.round(result.errors)),
+    }
 
-      updateCurrentAccount((current) => {
-        const newCompletion = !current.progress.completedLessons.includes(lesson.id)
-        const notification = {
-          id: createId('notice'),
-          title: newCompletion ? 'Lição concluída' : 'Prática registrada',
-          message: `${lesson.title}: ${attempt.wpm} WPM, ${attempt.accuracy
-            .toString()
-            .replace('.', ',')}% de precisão e +${attempt.xp} XP.`,
-          kind: 'lesson',
-          href: '/app/progresso',
-          read: false,
-          createdAt: new Date().toISOString(),
-        }
+    try {
+      setAccount(await api.recordAttempt(lesson.id, payload))
+      return { ok: true }
+    } catch (error) {
+      return { ok: false, error: errorMessage(error) }
+    }
+  }, [])
 
-        return {
-          ...current,
-          progress: {
-            completedLessons: newCompletion
-              ? [...current.progress.completedLessons, lesson.id]
-              : current.progress.completedLessons,
-            attempts: [attempt, ...current.progress.attempts],
-          },
-          notifications: [notification, ...current.notifications].slice(0, 30),
-        }
+  const resetProgress = useCallback(async () => {
+    try {
+      setAccount(await api.resetProgress())
+      return { ok: true }
+    } catch (error) {
+      return { ok: false, error: errorMessage(error) }
+    }
+  }, [])
+
+  const restoreDemo = useCallback(async () => {
+    try {
+      applySession(await api.restoreDemo())
+      return { ok: true }
+    } catch (error) {
+      return { ok: false, error: errorMessage(error) }
+    }
+  }, [applySession])
+
+  const markNotificationRead = useCallback((id) => {
+    setAccount((current) =>
+      current
+        ? {
+            ...current,
+            notifications: current.notifications.map((notification) =>
+              notification.id === id ? { ...notification, read: true } : notification,
+            ),
+          }
+        : current,
+    )
+
+    api
+      .markNotificationRead(id)
+      .then(setAccount)
+      .catch(() => {
+        api
+          .me()
+          .then(setAccount)
+          .catch(() => {})
       })
-
-      return attempt
-    },
-    [updateCurrentAccount],
-  )
-
-  const resetProgress = useCallback(() => {
-    updateCurrentAccount((current) => ({
-      ...current,
-      progress: { completedLessons: [], attempts: [] },
-      notifications: [
-        {
-          id: createId('notice'),
-          title: 'Progresso redefinido',
-          message: 'Seu histórico de prática foi zerado. Você pode começar de novo.',
-          kind: 'goal',
-          href: '/app/trilhas',
-          read: false,
-          createdAt: new Date().toISOString(),
-        },
-        ...current.notifications,
-      ].slice(0, 30),
-    }))
-  }, [updateCurrentAccount])
-
-  const restoreDemo = useCallback(() => {
-    const demo = createDemoAccount()
-    setAccounts((current) => ({ ...current, demo }))
-    setSession({ userId: demo.user.id, signedInAt: new Date().toISOString() })
   }, [])
-
-  const markNotificationRead = useCallback(
-    (id) => {
-      updateCurrentAccount((current) => ({
-        ...current,
-        notifications: current.notifications.map((notification) =>
-          notification.id === id ? { ...notification, read: true } : notification,
-        ),
-      }))
-    },
-    [updateCurrentAccount],
-  )
 
   const markAllNotificationsRead = useCallback(() => {
-    updateCurrentAccount((current) => ({
-      ...current,
-      notifications: current.notifications.map((notification) => ({
-        ...notification,
-        read: true,
-      })),
-    }))
-  }, [updateCurrentAccount])
+    setAccount((current) =>
+      current
+        ? {
+            ...current,
+            notifications: current.notifications.map((notification) => ({
+              ...notification,
+              read: true,
+            })),
+          }
+        : current,
+    )
+
+    api
+      .markAllNotificationsRead()
+      .then(setAccount)
+      .catch(() => {
+        api
+          .me()
+          .then(setAccount)
+          .catch(() => {})
+      })
+  }, [])
+
+  const allLessons = useMemo(
+    () =>
+      catalog.flatMap((course) =>
+        course.modules.flatMap((module) =>
+          module.lessons.map((lesson) => ({
+            ...lesson,
+            courseId: course.id,
+            courseTitle: course.title,
+            moduleId: module.id,
+            moduleTitle: module.title,
+          })),
+        ),
+      ),
+    [catalog],
+  )
 
   const attempts = useMemo(
-    () => sortAttempts(account?.progress.attempts ?? []),
+    () => sortAttempts(account?.attempts ?? []),
     [account],
   )
-  const completedLessons = account?.progress.completedLessons ?? []
+  const completedLessons = account?.completedLessons ?? []
   const prefs = account?.prefs ?? {}
 
   const stats = useMemo(
@@ -276,8 +253,8 @@ export function AppProvider({ children }) {
 
   const coursesWithProgress = useMemo(
     () =>
-      courses.map((course) => computeCourseProgress(course, completedLessons, attempts)),
-    [attempts, completedLessons],
+      catalog.map((course) => computeCourseProgress(course, completedLessons, attempts)),
+    [catalog, attempts, completedLessons],
   )
 
   const nextLessonInfo = useMemo(
@@ -318,11 +295,26 @@ export function AppProvider({ children }) {
     [account],
   )
 
+  const isLessonUnlocked = useCallback(
+    (lessonId) => {
+      const lesson = allLessons.find((item) => item.id === lessonId)
+      if (!lesson) return false
+      if (completedLessons.includes(lessonId)) return true
+
+      const entries = allLessons.filter((item) => item.courseId === lesson.courseId)
+      const index = entries.findIndex((item) => item.id === lessonId)
+      if (index <= 0) return true
+      return completedLessons.includes(entries[index - 1].id)
+    },
+    [allLessons, completedLessons],
+  )
+
   const value = useMemo(
     () => ({
       user: account?.user ?? null,
       prefs,
-      isAuthenticated,
+      isAuthenticated: Boolean(account),
+      authReady,
       login,
       loginDemo,
       signup,
@@ -344,22 +336,14 @@ export function AppProvider({ children }) {
       unreadCount: notifications.filter((notification) => !notification.read).length,
       markNotificationRead,
       markAllNotificationsRead,
-      getCourseById: getCourse,
-      getLessonById: getLesson,
-      isLessonUnlocked: (lessonId) => {
-        const lesson = getLesson(lessonId)
-        if (!lesson) return false
-        const course = coursesWithProgress.find((item) => item.id === lesson.courseId)
-        if (!course) return false
-        const index = course.lessons.findIndex((item) => item.id === lessonId)
-        if (index <= 0) return true
-        return course.lessons[index - 1].completed
-      },
+      getCourseById: (courseId) => catalog.find((course) => course.id === courseId) ?? null,
+      getLessonById: (lessonId) => allLessons.find((lesson) => lesson.id === lessonId) ?? null,
+      isLessonUnlocked,
     }),
     [
       account,
       prefs,
-      isAuthenticated,
+      authReady,
       login,
       loginDemo,
       signup,
@@ -380,6 +364,9 @@ export function AppProvider({ children }) {
       notifications,
       markNotificationRead,
       markAllNotificationsRead,
+      catalog,
+      allLessons,
+      isLessonUnlocked,
     ],
   )
 

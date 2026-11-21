@@ -1,9 +1,12 @@
 import { Navigate, Outlet, useLocation } from 'react-router-dom'
 import { useApp } from '../../context/AppContext'
+import AppLoading from './AppLoading'
 
 export default function ProtectedRoute({ children }) {
-  const { isAuthenticated } = useApp()
+  const { isAuthenticated, authReady } = useApp()
   const location = useLocation()
+
+  if (!authReady) return <AppLoading />
 
   if (!isAuthenticated) {
     return (
@@ -19,7 +22,8 @@ export default function ProtectedRoute({ children }) {
 }
 
 export function PublicOnlyRoute({ children }) {
-  const { isAuthenticated } = useApp()
+  const { isAuthenticated, authReady } = useApp()
+  if (!authReady) return <AppLoading />
   if (isAuthenticated) return <Navigate to="/app" replace />
   return children ?? <Outlet />
 }

@@ -52,9 +52,11 @@ export default function ProfilePage() {
   })
   const [error, setError] = useState('')
   const [saved, setSaved] = useState(false)
+  const [saving, setSaving] = useState(false)
   const [dangerAction, setDangerAction] = useState(null)
+  const [dangerLoading, setDangerLoading] = useState(false)
 
-  usePageMeta('Perfil e ajustes — DigitaCourse', 'Gerencie seus dados, metas e preferências da conta local.')
+  usePageMeta('Perfil e ajustes — DigitaCourse', 'Gerencie seus dados, metas e preferências da sua conta.')
 
   useEffect(() => {
     setForm({
@@ -72,14 +74,17 @@ export default function ProfilePage() {
     if (error) setError('')
   }
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault()
+    if (saving) return
     if (form.name.trim().length < 2) {
       setError('Informe um nome com pelo menos 2 caracteres.')
       return
     }
 
-    updateProfile({
+    setSaving(true)
+    setError('')
+    const result = await updateProfile({
       name: form.name,
       prefs: {
         dailyGoalMinutes: form.dailyGoalMinutes,
@@ -88,16 +93,34 @@ export default function ProfilePage() {
         weeklySummary: form.weeklySummary,
       },
     })
+    setSaving(false)
+    if (!result.ok) {
+      setError(result.error)
+      return
+    }
     setSaved(true)
-    showToast('Preferências salvas', 'Seu perfil e sua meta diária foram atualizados.')
+    showToast('Preferências salvas', 'Seu perfil e sua meta diária foram atualizados no banco.')
   }
 
-  const handleDanger = () => {
+  const handleDanger = async () => {
+    if (dangerLoading) return
+    setDangerLoading(true)
+
     if (dangerAction === 'reset') {
-      resetProgress()
-      showToast('Progresso redefinido', 'Seu histórico de prática foi zerado nesta conta local.')
+      const result = await resetProgress()
+      setDangerLoading(false)
+      if (!result.ok) {
+        setError(result.error)
+        return
+      }
+      showToast('Progresso redefinido', 'Seu histórico de prática foi zerado na sua conta.')
     } else if (dangerAction === 'restore') {
-      restoreDemo()
+      const result = await restoreDemo()
+      setDangerLoading(false)
+      if (!result.ok) {
+        setError(result.error)
+        return
+      }
       showToast('Conta demo restaurada', 'Você voltou para a conta de demonstração com os dados completos.')
       navigate('/app')
     }
@@ -107,7 +130,7 @@ export default function ProfilePage() {
   const handleLogout = () => {
     logout()
     showToast('Sessão encerrada', 'Até a próxima prática.')
-    navigate('/')
+    navigate('/entrar', { replace: true })
   }
 
   const completedCourses = courses.filter((course) => course.complete).length
@@ -123,7 +146,7 @@ export default function ProfilePage() {
       <PageHeader
         eyebrow="Perfil e ajustes"
         title="Sua conta, suas regras."
-        description="Ajuste como quer ser chamado, sua meta diária e o que aparece para a comunidade. Tudo fica salvo neste navegador."
+        description="Ajuste como quer ser chamado, sua meta diária e o que aparece para a comunidade. Tudo fica salvo na sua conta."
         actions={
           <button className="btn btn--outline" type="button" onClick={handleLogout}>
             <LogOut size={16} />
@@ -138,7 +161,7 @@ export default function ProfilePage() {
             <span className="profile-identity__avatar app-avatar app-avatar--xl">
               {getInitials(user?.name)}
             </span>
-            <span className="app-eyebrow">Conta local</span>
+            <span className="app-eyebrow">Conta DigitaCourse</span>
             <h2>{user?.name}</h2>
             <p>{user?.email}</p>
             <span className="profile-identity__role">
@@ -188,10 +211,10 @@ export default function ProfilePage() {
               <Shield size={19} />
             </span>
             <div>
-              <strong>Seus dados ficam aqui.</strong>
+              <strong>Seus dados ficam na sua conta.</strong>
               <p>
-                Conta, preferências e progresso são salvos no <code>localStorage</code> deste
-                navegador. Nada é enviado para um servidor nesta etapa.
+                Conta, preferências e progresso são salvos no PostgreSQL e acessados pela API
+                Spring Boot com uma sessão JWT.
               </p>
             </div>
             <Link className="app-panel__link" to="/app/ranking">
@@ -245,7 +268,7 @@ export default function ProfilePage() {
                   <Mail size={17} />
                   <input type="email" value={user?.email ?? ''} readOnly disabled />
                 </span>
-                <span className="field__hint">O e-mail é a chave da conta local e não pode ser alterado.</span>
+                <span className="field__hint">O e-mail é a chave da conta e não pode ser alterado.</span>
               </label>
             </div>
 
@@ -273,10 +296,10 @@ export default function ProfilePage() {
             <div className="profile-save-row">
               <span>
                 <Spark size={15} />
-                Alterações salvas localmente.
+                {saving ? 'Salvando na sua conta…' : 'Alterações persistidas no banco de dados.'}
               </span>
-              <button className="btn btn--primary" type="submit">
-                Salvar alterações
+              <button className="btn btn--primary" type="submit" disabled={saving}>
+                {saving ? 'Salvando…' : 'Salvar alterações'}
               </button>
             </div>
           </form>
@@ -286,7 +309,7 @@ export default function ProfilePage() {
               <div>
                 <span className="app-eyebrow">Preferências</span>
                 <h2>Privacidade e avisos</h2>
-                <p>Controle sua presença na comunidade e os lembretes simulados.</p>
+                <p>Controle sua presença na comunidade e os lembretes registrados na conta.</p>
               </div>
             </div>
 
@@ -334,7 +357,7 @@ export default function ProfilePage() {
                 </span>
                 <span className="profile-toggle__copy">
                   <strong>Lembretes por e-mail</strong>
-                  <small>Avisos simulados de prática e metas. Nenhum e-mail real é enviado.</small>
+                  <small>Avisos de prática e metas. O envio de e-mail ainda não está habilitado.</small>
                 </span>
                 <span className="switch">
                   <input
@@ -376,7 +399,7 @@ export default function ProfilePage() {
               <div>
                 <span className="app-eyebrow">Zona de cuidado</span>
                 <h2>Dados de demonstração</h2>
-                <p>Estas ações alteram apenas o conteúdo salvo neste navegador.</p>
+                <p>Estas ações alteram os dados salvos da sua conta no banco.</p>
               </div>
             </div>
 
@@ -434,8 +457,13 @@ export default function ProfilePage() {
                   >
                     Cancelar
                   </button>
-                  <button className="btn btn--primary btn--sm" type="button" onClick={handleDanger}>
-                    Confirmar
+                  <button
+                    className="btn btn--primary btn--sm"
+                    type="button"
+                    onClick={handleDanger}
+                    disabled={dangerLoading}
+                  >
+                    {dangerLoading ? 'Processando…' : 'Confirmar'}
                   </button>
                 </div>
               </div>

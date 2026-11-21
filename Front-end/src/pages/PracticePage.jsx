@@ -180,7 +180,11 @@ export default function PracticePage() {
     setElapsedMs(elapsed)
     setStatus('finished')
     setResult(finalResult)
-    recordAttempt(lesson, finalResult)
+    recordAttempt(lesson, finalResult).then((saved) => {
+      if (!saved.ok) {
+        showToast('Progresso não salvo', saved.error)
+      }
+    })
     showToast(
       'Lição concluída',
       `${wpm} WPM, ${formatNumber(accuracy, 1)}% de precisão e +${xp} XP.`,
@@ -316,7 +320,7 @@ export default function PracticePage() {
                 <p>
                   {result.bonus > 0
                     ? `Inclui +${result.bonus} XP de bônus por precisão acima de 98%.`
-                    : 'Sua tentativa foi salva no histórico desta conta local.'}
+                    : 'Sua tentativa foi salva no histórico da sua conta.'}
                 </p>
                 <span>
                   <Flame size={14} />

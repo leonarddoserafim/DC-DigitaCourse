@@ -106,7 +106,7 @@ export default function Sidebar({ open, onClose }) {
           <span className="app-avatar app-avatar--sm">{getInitials(user?.name)}</span>
           <span className="app-user__text">
             <strong>{user?.name}</strong>
-            <small>Aluno · conta local</small>
+            <small>Aluno · DigitaCourse</small>
           </span>
         </Link>
         <button className="app-logout" type="button" onClick={handleLogout} aria-label="Sair da conta">

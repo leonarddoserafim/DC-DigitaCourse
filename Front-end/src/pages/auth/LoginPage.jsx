@@ -5,7 +5,7 @@ import { ArrowUpRight, Eye, EyeOff, Lock, Mail, Spark } from '../../components/I
 import { useApp } from '../../context/AppContext'
 import { useToast } from '../../context/ToastContext'
 import usePageMeta from '../../hooks/usePageMeta'
-import { DEMO_EMAIL } from '../../data/seed'
+import { DEMO_EMAIL } from '../../data/demo'
 
 export default function LoginPage() {
   const { login, loginDemo } = useApp()
@@ -15,6 +15,8 @@ export default function LoginPage() {
   const [form, setForm] = useState({ email: '', password: '' })
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState('')
+  const [submitting, setSubmitting] = useState(false)
+  const [demoLoading, setDemoLoading] = useState(false)
 
   usePageMeta('Entrar — DigitaCourse', 'Acesse sua conta do DigitaCourse e continue praticando.')
 
@@ -26,9 +28,13 @@ export default function LoginPage() {
     if (error) setError('')
   }
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault()
-    const result = login(form.email, form.password)
+    if (submitting || demoLoading) return
+    setSubmitting(true)
+    setError('')
+    const result = await login(form.email, form.password)
+    setSubmitting(false)
     if (!result.ok) {
       setError(result.error)
       return
@@ -37,8 +43,16 @@ export default function LoginPage() {
     navigate(destination, { replace: true })
   }
 
-  const handleDemo = () => {
-    loginDemo()
+  const handleDemo = async () => {
+    if (submitting || demoLoading) return
+    setDemoLoading(true)
+    setError('')
+    const result = await loginDemo()
+    setDemoLoading(false)
+    if (!result.ok) {
+      setError(result.error)
+      return
+    }
     showToast('Conta de demonstração', 'Você entrou como Marina Costa.')
     navigate(destination, { replace: true })
   }
@@ -101,19 +115,23 @@ export default function LoginPage() {
               </button>
             </span>
             <span className="field__hint" id="login-password-hint">
-              Nesta etapa, qualquer senha com 4 ou mais caracteres é aceita.
+              Sua senha é validada pela API e armazenada com criptografia BCrypt.
             </span>
           </label>
 
           <div className="auth-form__row">
-            <span className="auth-form__note">Autenticação simulada · sem back-end</span>
+            <span className="auth-form__note">Sessão protegida por JWT</span>
             <Link className="auth-link" to="/recuperar-senha">
               Esqueci minha senha
             </Link>
           </div>
 
-          <button className="btn btn--primary auth-submit" type="submit">
-            Entrar na plataforma
+          <button
+            className="btn btn--primary auth-submit"
+            type="submit"
+            disabled={submitting || demoLoading}
+          >
+            {submitting ? 'Entrando…' : 'Entrar na plataforma'}
             <span className="btn__icon" aria-hidden="true">
               <ArrowUpRight size={17} />
             </span>
@@ -124,13 +142,20 @@ export default function LoginPage() {
           <span>ou experimente sem cadastro</span>
         </div>
 
-        <button className="auth-demo" type="button" onClick={handleDemo}>
+        <button
+          className="auth-demo"
+          type="button"
+          onClick={handleDemo}
+          disabled={submitting || demoLoading}
+        >
           <span className="auth-demo__icon">
             <Spark size={18} />
           </span>
           <span className="auth-demo__text">
-            <strong>Entrar com conta de demonstração</strong>
-            <small>{DEMO_EMAIL} · dados de exemplo completos</small>
+            <strong>
+              {demoLoading ? 'Preparando a demonstração…' : 'Entrar com conta de demonstração'}
+            </strong>
+            <small>{DEMO_EMAIL} · dados de exemplo persistidos no PostgreSQL</small>
           </span>
           <ArrowUpRight size={18} />
         </button>

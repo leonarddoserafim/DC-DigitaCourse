@@ -19,6 +19,7 @@ export default function SignupPage() {
   })
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState('')
+  const [submitting, setSubmitting] = useState(false)
 
   usePageMeta('Criar conta — DigitaCourse', 'Crie sua conta no DigitaCourse e comece sua jornada de digitação.')
 
@@ -28,8 +29,9 @@ export default function SignupPage() {
     if (error) setError('')
   }
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault()
+    if (submitting) return
     if (!form.terms) {
       setError('Aceite os termos para criar a conta.')
       return
@@ -39,11 +41,14 @@ export default function SignupPage() {
       return
     }
 
-    const result = signup({
+    setSubmitting(true)
+    setError('')
+    const result = await signup({
       name: form.name,
       email: form.email,
       password: form.password,
     })
+    setSubmitting(false)
     if (!result.ok) {
       setError(result.error)
       return
@@ -127,7 +132,7 @@ export default function SignupPage() {
               </button>
             </span>
             <span className="field__hint" id="signup-password-hint">
-              Use pelo menos 6 caracteres. A senha não é armazenada nesta demonstração.
+              Use pelo menos 6 caracteres. A senha é armazenada como hash BCrypt.
             </span>
           </label>
 
@@ -161,8 +166,12 @@ export default function SignupPage() {
             </span>
           </label>
 
-          <button className="btn btn--primary auth-submit" type="submit">
-            Criar minha conta
+          <button
+            className="btn btn--primary auth-submit"
+            type="submit"
+            disabled={submitting}
+          >
+            {submitting ? 'Criando sua conta…' : 'Criar minha conta'}
             <span className="btn__icon" aria-hidden="true">
               <ArrowUpRight size={17} />
             </span>

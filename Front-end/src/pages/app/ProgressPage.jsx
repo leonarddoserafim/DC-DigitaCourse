@@ -396,8 +396,8 @@ export default function ProgressPage() {
       <div className="progress-footnote" data-reveal>
         <CheckCircle size={16} />
         <span>
-          Os dados desta página são calculados localmente a partir das tentativas salvas no
-          navegador. Nenhuma informação é enviada para um servidor.
+          Os dados desta página são calculados a partir das tentativas salvas no PostgreSQL e
+          carregadas pela API do DigitaCourse.
         </span>
       </div>
     </div>

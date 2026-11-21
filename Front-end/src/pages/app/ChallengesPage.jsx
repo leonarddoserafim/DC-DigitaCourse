@@ -196,8 +196,8 @@ export default function ChallengesPage() {
         <div>
           <h2>Como os desafios funcionam</h2>
           <p>
-            O progresso é calculado a partir das suas tentativas registradas nesta conta local. As
-            metas renovam com o tempo, mas o histórico permanece. Você pode ajustar a meta diária no
+            O progresso é calculado a partir das suas tentativas registradas na sua conta. As metas
+            renovam com o tempo, mas o histórico permanece. Você pode ajustar a meta diária no
             perfil.
           </p>
         </div>

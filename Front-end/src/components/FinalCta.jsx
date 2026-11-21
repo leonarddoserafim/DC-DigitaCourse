@@ -28,7 +28,7 @@ export default function FinalCta() {
             <h2 id="cta-title">Sua próxima tecla pode ser o começo.</h2>
             <p>
               O DigitaCourse está sendo construído para acompanhar você do primeiro exercício à
-              fluência. Crie sua conta local e experimente a área do aluno.
+              fluência. Crie sua conta e experimente a área do aluno.
             </p>
             <div className="cta-actions">
               <Link className="btn btn--mint btn--lg" to={practiceHref}>

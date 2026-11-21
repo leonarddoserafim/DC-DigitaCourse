@@ -23,9 +23,9 @@ const faqs = [
       'A interface é responsiva e funciona em navegadores modernos no computador, tablet ou celular. O treino completo de digitação, porém, foi pensado para teclados físicos.',
   },
   {
-    question: 'Como funciona a conta nesta etapa?',
+    question: 'Como funciona a conta?',
     answer:
-      'Você já pode criar uma conta local e entrar na área do aluno. Nesta etapa de front-end, cadastro, login, progresso e preferências ficam salvos apenas no navegador; não há back-end nem envio real de e-mail. A conta de demonstração traz dados de exemplo para explorar todos os recursos.',
+      'Você já pode criar uma conta e entrar na área do aluno. Cadastro, login, progresso e preferências são salvos no PostgreSQL e acessados por uma API Spring Boot; o envio real de e-mail ainda não está habilitado. A conta de demonstração traz dados de exemplo para explorar todos os recursos.',
   },
 ]
 

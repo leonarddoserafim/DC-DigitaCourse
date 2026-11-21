@@ -29,7 +29,7 @@ export default function ForgotPasswordPage() {
         <p className="auth-card__lead">
           {sent
             ? 'Se existir uma conta com este e-mail, as instruções de recuperação apareceriam aqui.'
-            : 'Informe o e-mail da sua conta. Nesta demonstração, o envio é apenas simulado.'}
+            : 'Informe o e-mail da sua conta. A recuperação automática por e-mail ainda não faz parte desta etapa.'}
         </p>
 
         {sent ? (
@@ -39,8 +39,8 @@ export default function ForgotPasswordPage() {
             </span>
             <strong>Pedido registrado</strong>
             <p>
-              Em um ambiente real, você receberia um link seguro para criar uma nova senha. Nenhum
-              e-mail foi enviado nesta etapa.
+              A recuperação de senha ainda depende de um serviço de e-mail, que não faz parte desta
+              etapa. Nenhuma mensagem foi enviada.
             </p>
             <Link className="btn btn--outline" to="/entrar">
               <ArrowLeft size={16} />
