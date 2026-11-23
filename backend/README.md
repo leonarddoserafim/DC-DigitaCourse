@@ -2,7 +2,7 @@
 
 API Spring Boot do DigitaCourse. Persiste contas, catálogo, tentativas, progresso, preferências e notificações no PostgreSQL, com autenticação JWT e senhas BCrypt.
 
-A documentação completa da etapa está em [`docs/etapas/etapa-03-banco-de-dados.md`](../docs/etapas/etapa-03-banco-de-dados.md).
+A documentação da etapa está em [`docs/etapas/etapa-03-banco-de-dados.md`](../docs/etapas/etapa-03-banco-de-dados.md). A evolução pós-Etapa 03 está no [roadmap de 20 entregas](../docs/entregas/README.md), com a [Entrega 01](../docs/entregas/entrega-01-testes-de-integracao.md) concluída.
 
 ## Stack
 
@@ -13,6 +13,7 @@ A documentação completa da etapa está em [`docs/etapas/etapa-03-banco-de-dado
 | PostgreSQL | 17.6 |
 | Flyway | Migrações V1 e V2 |
 | Maven | 3.9+ |
+| Testes | JUnit 5, Spring Boot Test, MockMvc e AssertJ |
 
 ## Banco de dados
 
@@ -42,6 +43,37 @@ A API sobe em `http://127.0.0.1:8080/api`.
 ```bash
 curl http://127.0.0.1:8080/api/health
 ```
+
+## Testes de integração
+
+A suíte usa Spring Boot Test, MockMvc e um PostgreSQL real no banco dedicado `digitacourse_test`. Ela cobre saúde, catálogo, autenticação, cadastro, sessão JWT, perfil, tentativas, bloqueio sequencial, bônus de XP, reset, restauração da demo e notificações.
+
+Na primeira execução, crie o banco:
+
+```bash
+createdb -h 127.0.0.1 -p 5432 -U postgres digitacourse_test
+```
+
+Depois execute:
+
+```bash
+mvn -B test
+```
+
+Resultado esperado: **24 testes, zero falhas**.
+
+O perfil `test` aplica as migrações Flyway, restaura a demo antes de cada teste e remove os usuários criados pela suíte. Antes de qualquer limpeza, o teste confere se o banco atual é `digitacourse_test`; assim, o banco de desenvolvimento `digitacourse` não é alterado.
+
+As variáveis opcionais são:
+
+| Variável | Padrão |
+| --- | --- |
+| `DIGITACOURSE_TEST_DB_URL` | `jdbc:postgresql://127.0.0.1:5432/digitacourse_test` |
+| `DIGITACOURSE_TEST_DB_USER` | `postgres` |
+| `DIGITACOURSE_TEST_DB_PASSWORD` | vazio |
+| `DIGITACOURSE_TEST_JWT_SECRET` | Chave exclusiva de teste com 32+ caracteres |
+
+Detalhes da entrega: [`docs/entregas/entrega-01-testes-de-integracao.md`](../docs/entregas/entrega-01-testes-de-integracao.md).
 
 ## Variáveis de ambiente
 
@@ -100,13 +132,22 @@ Nunca edite uma migração já aplicada. Crie `V3__descricao.sql`, `V4__descrica
 ## Estrutura
 
 ```text
-src/main/java/com/digitacourse/api/
-├── config/       # Segurança e seed da demo
-├── domain/       # Entidades JPA
-├── repository/   # Spring Data
-├── security/     # JWT e principal
-├── service/      # Regras de negócio
-└── web/          # Controllers, DTOs e erros
+src/
+├── main/
+│   ├── java/com/digitacourse/api/
+│   │   ├── config/       # Segurança e seed da demo
+│   │   ├── domain/       # Entidades JPA
+│   │   ├── repository/   # Spring Data
+│   │   ├── security/     # JWT e principal
+│   │   ├── service/      # Regras de negócio
+│   │   └── web/          # Controllers, DTOs e erros
+│   └── resources/
+│       ├── application.yml
+│       └── db/migration/ # Flyway V1 e V2
+└── test/
+    ├── java/com/digitacourse/api/        # Testes de integração
+    │   └── support/                      # Base, limpeza e guarda de banco
+    └── resources/application-test.yml    # Banco digitacourse_test
 ```
 
 ## Limites desta etapa
@@ -115,3 +156,5 @@ src/main/java/com/digitacourse/api/
 - Sem refresh token, revogação, rate limiting ou verificação de e-mail.
 - Sem área administrativa.
 - JWT no `localStorage` do front-end.
+- Sem CI, testes de front-end, lint ou cobertura mínima.
+- O roadmap completo está em [`docs/entregas/README.md`](../docs/entregas/README.md).
