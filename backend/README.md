@@ -2,7 +2,7 @@
 
 API Spring Boot do DigitaCourse. Persiste contas, catálogo, tentativas, progresso, preferências e notificações no PostgreSQL, com autenticação JWT e senhas BCrypt.
 
-A documentação da etapa está em [`docs/etapas/etapa-03-banco-de-dados.md`](../docs/etapas/etapa-03-banco-de-dados.md). A evolução pós-Etapa 03 está no [roadmap de 20 entregas](../docs/entregas/README.md), com a [Entrega 01](../docs/entregas/entrega-01-testes-de-integracao.md) concluída.
+A documentação da etapa está em [`docs/etapas/etapa-03-banco-de-dados.md`](../docs/etapas/etapa-03-banco-de-dados.md). A evolução pós-Etapa 03 está no [roadmap de 20 entregas](../docs/entregas/README.md), com a [Entrega 01](../docs/entregas/entrega-01-testes-de-integracao.md) concluída e a [Entrega 02](../docs/entregas/entrega-02-git-ci.md) concluída localmente, incluindo a CI.
 
 ## Stack
 
@@ -14,6 +14,7 @@ A documentação da etapa está em [`docs/etapas/etapa-03-banco-de-dados.md`](..
 | Flyway | Migrações V1 e V2 |
 | Maven | 3.9+ |
 | Testes | JUnit 5, Spring Boot Test, MockMvc e AssertJ |
+| CI | GitHub Actions com JDK 21 e PostgreSQL 17 |
 
 ## Banco de dados
 
@@ -62,6 +63,8 @@ mvn -B test
 
 Resultado esperado: **24 testes, zero falhas**.
 
+O mesmo comando roda na CI com um PostgreSQL 17 de serviço e as mesmas variáveis do perfil `test`. Os relatórios Surefire são publicados como artefato por sete dias em `backend/target/surefire-reports`.
+
 O perfil `test` aplica as migrações Flyway, restaura a demo antes de cada teste e remove os usuários criados pela suíte. Antes de qualquer limpeza, o teste confere se o banco atual é `digitacourse_test`; assim, o banco de desenvolvimento `digitacourse` não é alterado.
 
 As variáveis opcionais são:
@@ -74,6 +77,19 @@ As variáveis opcionais são:
 | `DIGITACOURSE_TEST_JWT_SECRET` | Chave exclusiva de teste com 32+ caracteres |
 
 Detalhes da entrega: [`docs/entregas/entrega-01-testes-de-integracao.md`](../docs/entregas/entrega-01-testes-de-integracao.md).
+
+## Integração contínua
+
+O workflow [`.github/workflows/ci.yml`](../.github/workflows/ci.yml) roda em push para `main`, pull requests para `main` e execução manual. O job de backend:
+
+- sobe PostgreSQL 17 como serviço com health check;
+- configura JDK 21 Temurin e cache Maven;
+- executa `mvn -B test` em `backend/`;
+- publica os relatórios Surefire como artefato.
+
+O job de front-end executa `npm ci` e `npm run build` com Node.js 22. Os dois checks devem ficar verdes antes do merge.
+
+A CI ainda não foi executada no GitHub porque o repositório não foi publicado em um remoto. O procedimento de publicação e proteção da `main` está em [`CONTRIBUTING.md`](../CONTRIBUTING.md) e na [Entrega 02](../docs/entregas/entrega-02-git-ci.md).
 
 ## Variáveis de ambiente
 
@@ -156,5 +172,6 @@ src/
 - Sem refresh token, revogação, rate limiting ou verificação de e-mail.
 - Sem área administrativa.
 - JWT no `localStorage` do front-end.
-- Sem CI, testes de front-end, lint ou cobertura mínima.
+- Sem testes de front-end, lint ou cobertura mínima.
+- A CI está configurada, mas ainda não foi executada no GitHub; publicação e proteção da `main` são passos manuais.
 - O roadmap completo está em [`docs/entregas/README.md`](../docs/entregas/README.md).

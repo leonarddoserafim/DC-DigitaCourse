@@ -2,7 +2,7 @@
 
 Plataforma de treinamento de digitação criada para transformar velocidade e precisão em confiança no dia a dia. O projeto é acadêmico, desenvolvido no contexto da Fatec Praia Grande (Baixada Santista/SP), e está sendo construído por etapas.
 
-> **Status atual:** Etapa 03 concluída — API Spring Boot + PostgreSQL, autenticação JWT e persistência real de contas, catálogo, progresso, preferências e notificações.
+> **Status atual:** Etapa 03 concluída e Entregas 01 e 02 do roadmap entregues — testes de integração da API, repositório Git com higiene e CI de backend/front-end. A publicação no GitHub e a proteção da branch `main` são passos manuais pendentes.
 
 ![Página inicial do DigitaCourse](docs/assets/etapa-01/desktop.jpg)
 
@@ -22,7 +22,11 @@ Plataforma de treinamento de digitação criada para transformar velocidade e pr
 - Perfil com nome, meta diária, preferências, redefinição de progresso e restauração da conta demo.
 - Layout responsivo, menu mobile, modo focado de prática e página 404.
 - Metadados de página por rota e animações com respeito a `prefers-reduced-motion`.
-- API com Flyway, validação, tratamento centralizado de erros, health check e 25 verificações automatizadas.
+- API com Flyway, validação, tratamento centralizado de erros e health check.
+- 24 testes de integração versionados, executados localmente e configurados na CI, com banco PostgreSQL dedicado e restauração determinística da demo.
+- Repositório Git em `main`, com `.gitignore`, `.gitattributes` e histórico inicial sem artefatos locais.
+- Pipeline no GitHub Actions com dois checks: testes do backend em PostgreSQL 17 e build do front-end em Node.js 22.
+- Guia de contribuição com branches, Conventional Commits, pull requests e proteção planejada da `main`.
 - Interface validada em navegador real com 27 verificações e dezessete capturas da Etapa 03.
 
 ## Rotas principais
@@ -63,6 +67,11 @@ Em desenvolvimento, o Vite faz proxy de `/api` para a API. O token JWT é a úni
 
 ```text
 .
+├── .github/
+│   ├── workflows/ci.yml             # CI de backend e front-end
+│   └── pull_request_template.md     # Checklist de revisão
+├── .gitattributes                   # Line endings e binários
+├── .gitignore                       # Higiene de artefatos e dados locais
 ├── backend/
 │   ├── src/main/java/com/digitacourse/api/
 │   │   ├── config/                  # Segurança e seed da demo
@@ -74,6 +83,9 @@ Em desenvolvimento, o Vite faz proxy de `/api` para a API. O token JWT é a úni
 │   ├── src/main/resources/
 │   │   ├── application.yml          # Banco, JWT, CORS e porta
 │   │   └── db/migration/            # Flyway V1 e V2
+│   ├── src/test/
+│   │   ├── java/                    # Testes de integração e base de suporte
+│   │   └── resources/               # Perfil de teste com digitacourse_test
 │   └── pom.xml
 ├── frontend/
 │   ├── public/                      # Favicon e imagem Open Graph
@@ -101,17 +113,22 @@ Em desenvolvimento, o Vite faz proxy de `/api` para a API. O token JWT é a úni
 │   │   ├── etapa-01/
 │   │   ├── etapa-02/
 │   │   └── etapa-03/
+│   ├── entregas/
+│   │   ├── README.md                # Roadmap de 20 entregas
+│   │   ├── entrega-01-testes-de-integracao.md
+│   │   └── entrega-02-git-ci.md
 │   ├── etapas/
 │   │   ├── etapa-01-pagina-inicial.md
 │   │   ├── etapa-02-area-do-aluno.md
 │   │   └── etapa-03-banco-de-dados.md
 │   └── README.md
+├── CONTRIBUTING.md                  # Branches, commits, PRs e checks
 └── Cronograma_DigitaCourse/         # Artefatos de planejamento do projeto
 ```
 
 ## Como executar
 
-Requisitos: **JDK 21**, **Maven 3.9+**, **PostgreSQL 17** e **Node.js 20+** com npm. As ferramentas podem ser portáteis.
+Requisitos: **JDK 21**, **Maven 3.9+**, **PostgreSQL 17** e **Node.js 20.19+ ou 22.12+** com npm. As ferramentas podem ser portáteis.
 
 ### 1. PostgreSQL
 
@@ -162,7 +179,32 @@ Acesse `http://localhost:5173`.
 
 > No PowerShell do Windows, use `npm.cmd` caso a execução de `npm.ps1` esteja bloqueada pela política de scripts.
 
-### Variáveis de ambiente
+### 4. Testes da API
+
+A suíte usa PostgreSQL real, MockMvc e o banco dedicado `digitacourse_test`. Na primeira execução:
+
+```bash
+createdb -h 127.0.0.1 -p 5432 -U postgres digitacourse_test
+cd backend
+mvn test
+```
+
+Resultado esperado: **24 testes, zero falhas**. O banco de desenvolvimento `digitacourse` não é alterado. O mesmo comando roda na CI com um PostgreSQL 17 de serviço. Veja [Entrega 01](docs/entregas/entrega-01-testes-de-integracao.md) e [Entrega 02](docs/entregas/entrega-02-git-ci.md).
+
+### 5. Integração contínua
+
+O workflow [`.github/workflows/ci.yml`](.github/workflows/ci.yml) roda em push para `main`, pull requests direcionados a `main` e execução manual. Backend e front-end são validados em jobs independentes:
+
+| Check | Ambiente | Validação |
+| --- | --- | --- |
+| **Backend - testes de integração** | JDK 21 e PostgreSQL 17 de serviço | `mvn -B test` em `backend/` |
+| **Front-end - instalação e build** | Node.js 22 | `npm ci` e `npm run build` em `frontend/` |
+
+Os relatórios Surefire e o conteúdo de `frontend/dist` são publicados como artefatos por sete dias. Maven e npm usam cache entre execuções para reduzir o tempo da pipeline.
+
+A CI ainda não foi executada no GitHub porque o repositório não foi publicado em um remoto. O passo a passo para publicação, primeira execução e proteção da `main` está em [CONTRIBUTING.md](CONTRIBUTING.md) e na [Entrega 02](docs/entregas/entrega-02-git-ci.md).
+
+### 6. Variáveis de ambiente
 
 | Variável | Padrão | Função |
 | --- | --- | --- |
@@ -224,33 +266,40 @@ O build do front-end é gerado em `frontend/dist`. Para publicar a SPA, o host p
 | Migrações | Flyway |
 | Autenticação | JWT + BCrypt |
 | Build da API | Maven 3.9 |
+| Testes da API | JUnit 5, Spring Boot Test, MockMvc e AssertJ |
+| CI | GitHub Actions, JDK 21, PostgreSQL 17 e Node.js 22 |
 | Fontes | Sora, Inter e JetBrains Mono via Fontsource (self-hosted) |
 | Ícones | SVG inline, sem biblioteca externa |
 
 ## Escopo e limites
 
-- A área administrativa não foi solicitada e permanece fora de escopo.
-- O envio real de e-mail, a verificação de conta e a recuperação de senha por e-mail ainda não estão implementados.
+- A área administrativa e o envio real de e-mail estão planejados no roadmap, mas não implementados; verificação de conta e recuperação de senha por e-mail também seguem pendentes.
 - O ranking continua fictício e calculado no cliente.
 - O endpoint de restauração da demo é um atalho de desenvolvimento e deve ser protegido antes de produção.
 - O JWT fica no `localStorage` nesta etapa; uma aplicação de produção deve avaliar cookie `HttpOnly` + CSRF, refresh token e revogação de sessão.
-- Não há rate limiting, auditoria de acessibilidade automatizada ou pipeline de deploy configurados.
+- Os testes de API e a CI já estão versionados; ainda faltam testes de front-end, lint, rate limiting e auditoria de acessibilidade automatizada.
+- A primeira execução remota da CI e a proteção da branch `main` dependem de publicar o repositório no GitHub.
 
 ## Documentação
 
 - [Índice geral da documentação](docs/README.md)
+- [Roadmap de 20 entregas](docs/entregas/README.md)
+- [Entrega 01 — Testes de integração da API](docs/entregas/entrega-01-testes-de-integracao.md)
+- [Entrega 02 — Versionamento Git, higiene e pipeline de CI](docs/entregas/entrega-02-git-ci.md)
+- [Guia de contribuição](CONTRIBUTING.md)
 - [Etapa 01 — Página inicial](docs/etapas/etapa-01-pagina-inicial.md)
 - [Etapa 02 — Área do aluno](docs/etapas/etapa-02-area-do-aluno.md)
 - [Etapa 03 — Banco de dados, autenticação e persistência](docs/etapas/etapa-03-banco-de-dados.md)
 
 ## Próximos passos previstos
 
-1. Validação da Etapa 03 com o orientador e publicação de uma prévia.
-2. Proteção do endpoint de restauração da demo, rotação da chave JWT e HTTPS.
-3. Verificação de e-mail, recuperação de senha real e refresh token.
-4. Rate limiting, revogação de sessão e endurecimento da autenticação.
-5. Ranking real, notificações por e-mail e área administrativa.
-6. Testes versionados, lint, auditoria de acessibilidade e deploy com fallback de SPA.
+O plano completo, com objetivo, escopo e critérios de aceite das 20 entregas, está em [`docs/entregas/README.md`](docs/entregas/README.md). Antes da próxima entrega, falta publicar o repositório no GitHub, executar a CI e ativar a proteção da `main`. A ordem recomendada depois disso é:
+
+1. **Entregas 03 e 04:** lint, testes de componentes e E2E do front-end.
+2. **Entregas 05 e 06:** acessibilidade automatizada e contrato OpenAPI.
+3. **Entregas 07 a 11:** sessão, rate limiting, e-mail, privacidade e segredos.
+4. **Entregas 12 a 14:** observabilidade, publicação e backup.
+5. **Entregas 15 a 20:** histórico paginado, RBAC, administração, ranking e e-mail.
 
 ---
 
