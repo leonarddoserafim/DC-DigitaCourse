@@ -13,7 +13,8 @@ const filters = [
 ]
 
 export default function NotificationsPage() {
-  const { notifications, unreadCount, markNotificationRead, markAllNotificationsRead, prefs } = useApp()
+  const { notifications, unreadCount, markNotificationRead, markAllNotificationsRead, prefs } =
+    useApp()
   const [filter, setFilter] = useState('todas')
 
   usePageMeta(
@@ -50,7 +51,11 @@ export default function NotificationsPage() {
       <div className="notifications-layout">
         <section className="app-panel notifications-panel" data-reveal>
           <div className="notifications-panel__head">
-            <div className="app-filterbar app-filterbar--inline" role="group" aria-label="Filtrar notificações">
+            <div
+              className="app-filterbar app-filterbar--inline"
+              role="group"
+              aria-label="Filtrar notificações"
+            >
               {filters.map((item) => (
                 <button
                   key={item.id}
@@ -74,7 +79,9 @@ export default function NotificationsPage() {
           {filtered.length === 0 ? (
             <EmptyState
               icon="spark"
-              title={filter === 'nao-lidas' ? 'Nenhuma notificação não lida' : 'Tudo tranquilo por aqui'}
+              title={
+                filter === 'nao-lidas' ? 'Nenhuma notificação não lida' : 'Tudo tranquilo por aqui'
+              }
               description={
                 filter === 'nao-lidas'
                   ? 'Você já leu tudo. Novas práticas geram novos avisos.'

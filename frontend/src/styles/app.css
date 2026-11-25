@@ -730,7 +730,9 @@
   font-size: 10.5px;
   font-weight: 600;
   white-space: nowrap;
-  transition: gap 0.2s ease, color 0.2s ease;
+  transition:
+    gap 0.2s ease,
+    color 0.2s ease;
 }
 
 .app-panel__link:hover {
@@ -3313,8 +3315,7 @@
 .achievement-card.is-unlocked {
   border-color: rgba(15, 118, 110, 0.2);
   background:
-    linear-gradient(180deg, rgba(126, 224, 195, 0.09), transparent 45%),
-    rgba(255, 253, 248, 0.94);
+    linear-gradient(180deg, rgba(126, 224, 195, 0.09), transparent 45%), rgba(255, 253, 248, 0.94);
 }
 
 .achievement-card.is-locked {
@@ -3580,8 +3581,7 @@
   padding: 17px;
   border-radius: 17px;
   background:
-    radial-gradient(circle at 90% 10%, rgba(126, 224, 195, 0.12), transparent 9rem),
-    var(--ink);
+    radial-gradient(circle at 90% 10%, rgba(126, 224, 195, 0.12), transparent 9rem), var(--ink);
   color: #fff;
 }
 
@@ -6228,8 +6228,7 @@
   padding: 16px;
   border-radius: 17px;
   background:
-    radial-gradient(circle at 88% 10%, rgba(126, 224, 195, 0.13), transparent 9rem),
-    var(--ink);
+    radial-gradient(circle at 88% 10%, rgba(126, 224, 195, 0.13), transparent 9rem), var(--ink);
   color: var(--mint);
 }
 
@@ -6588,8 +6587,6 @@
   text-align: center;
   text-transform: uppercase;
 }
-
-
 
 /* ================================================================== */
 /* Responsivo                                                         */
@@ -7501,8 +7498,7 @@
   padding: 32px;
   text-align: center;
   background:
-    radial-gradient(circle at 50% 35%, rgba(126, 224, 195, 0.28), transparent 40%),
-    var(--paper);
+    radial-gradient(circle at 50% 35%, rgba(126, 224, 195, 0.28), transparent 40%), var(--paper);
 }
 
 .app-loading__keys {

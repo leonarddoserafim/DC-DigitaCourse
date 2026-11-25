@@ -38,7 +38,10 @@ export default function Sidebar({ open, onClose }) {
   }
 
   return (
-    <aside className={`app-sidebar${open ? ' is-open' : ''}`} aria-label="Navegação da área do aluno">
+    <aside
+      className={`app-sidebar${open ? ' is-open' : ''}`}
+      aria-label="Navegação da área do aluno"
+    >
       <div className="app-sidebar__head">
         <Logo light to="/app" />
         <button
@@ -109,7 +112,12 @@ export default function Sidebar({ open, onClose }) {
             <small>Aluno · DigitaCourse</small>
           </span>
         </Link>
-        <button className="app-logout" type="button" onClick={handleLogout} aria-label="Sair da conta">
+        <button
+          className="app-logout"
+          type="button"
+          onClick={handleLogout}
+          aria-label="Sair da conta"
+        >
           <LogOut size={18} />
         </button>
       </div>

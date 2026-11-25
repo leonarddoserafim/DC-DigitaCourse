@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import EmptyState from '../components/app/EmptyState'
 import ProgressRing from '../components/app/ProgressRing'
-import AppIcon from '../components/AppIcon'
 import {
   ArrowLeft,
   CheckCircle,
@@ -138,9 +137,7 @@ export default function PracticePage() {
   const totalHits = index + errors
   const liveAccuracy = totalHits ? (index / totalHits) * 100 : 100
   const liveWpm =
-    status === 'running' && elapsedMs > 250
-      ? Math.round((index / 5) / (elapsedMs / 60000))
-      : 0
+    status === 'running' && elapsedMs > 250 ? Math.round(index / 5 / (elapsedMs / 60000)) : 0
   const progress = Math.round((index / text.length) * 100)
   const normalizedExpected =
     expected === ' '
@@ -161,7 +158,7 @@ export default function PracticePage() {
     const startedAt = startRef.current ?? end
     const elapsed = Math.max(800, end - startedAt)
     const minutes = elapsed / 60000
-    const wpm = Math.round((correctChars / 5) / minutes)
+    const wpm = Math.round(correctChars / 5 / minutes)
     const total = correctChars + errorCount
     const accuracy = total ? (correctChars / total) * 100 : 100
     const durationSeconds = Math.max(1, Math.round(elapsed / 1000))
@@ -275,7 +272,9 @@ export default function PracticePage() {
             <h1>Boa, {firstName}.</h1>
             <p>
               Você concluiu <strong>{lesson.title}</strong> em {course?.title}.
-              {isNewRecord ? ' E esse é o seu novo recorde de velocidade!' : ' Mais um passo na sua fluência.'}
+              {isNewRecord
+                ? ' E esse é o seu novo recorde de velocidade!'
+                : ' Mais um passo na sua fluência.'}
             </p>
 
             <div className="typing-result__stats">
@@ -389,13 +388,14 @@ export default function PracticePage() {
         </div>
 
         <div className="typing-layout">
-          <section
+          <div
             className={`typing-card${isFocused ? ' is-focused' : ''}${
               wrongFlash ? ' is-wrong' : ''
             }`}
             ref={surfaceRef}
             tabIndex={0}
-            role="application"
+            role="textbox"
+            aria-multiline="true"
             aria-label={`Exercício de digitação: ${text}. Digite o texto exibido.`}
             onKeyDown={handleKeyDown}
             onFocus={() => setIsFocused(true)}
@@ -406,7 +406,11 @@ export default function PracticePage() {
               <span>Digite o trecho abaixo</span>
               <span className={`typing-live typing-live--${status}`}>
                 <i />
-                {status === 'idle' ? 'pronto para começar' : status === 'running' ? 'ao vivo' : 'finalizado'}
+                {status === 'idle'
+                  ? 'pronto para começar'
+                  : status === 'running'
+                    ? 'ao vivo'
+                    : 'finalizado'}
               </span>
             </div>
 
@@ -470,10 +474,10 @@ export default function PracticePage() {
             </div>
 
             <div className="typing-card__note">
-              <Target size={15} />
-              O texto só avança quando você acerta. Não é preciso usar Backspace.
+              <Target size={15} />O texto só avança quando você acerta. Não é preciso usar
+              Backspace.
             </div>
-          </section>
+          </div>
 
           <aside className="typing-aside">
             <div className="typing-side-card" data-reveal>
@@ -483,7 +487,10 @@ export default function PracticePage() {
               </div>
               <div className="typing-keyboard" aria-hidden="true">
                 {keyboardRows.map((row, rowIndex) => (
-                  <div className={`typing-keyboard__row typing-keyboard__row--${rowIndex + 1}`} key={rowIndex}>
+                  <div
+                    className={`typing-keyboard__row typing-keyboard__row--${rowIndex + 1}`}
+                    key={rowIndex}
+                  >
                     {row.map((key) => (
                       <span
                         className={`typing-key${normalizedExpected === key ? ' is-next' : ''}${
@@ -497,7 +504,9 @@ export default function PracticePage() {
                   </div>
                 ))}
                 <div className="typing-keyboard__row typing-keyboard__row--space">
-                  <span className={`typing-key typing-key--space${normalizedExpected === 'space' ? ' is-next' : ''}`}>
+                  <span
+                    className={`typing-key typing-key--space${normalizedExpected === 'space' ? ' is-next' : ''}`}
+                  >
                     espaço
                   </span>
                 </div>

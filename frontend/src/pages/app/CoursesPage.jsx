@@ -26,12 +26,11 @@ export default function CoursesPage() {
   const overallPercent = totalLessons
     ? Math.round((stats.lessonsCompleted / totalLessons) * 100)
     : 0
-  const practiceHref = nextLessonInfo
-    ? `/app/praticar/${nextLessonInfo.lesson.id}`
-    : '/app/trilhas'
+  const practiceHref = nextLessonInfo ? `/app/praticar/${nextLessonInfo.lesson.id}` : '/app/trilhas'
 
   const filtered = useMemo(() => {
-    if (filter === 'andamento') return courses.filter((course) => course.started && !course.complete)
+    if (filter === 'andamento')
+      return courses.filter((course) => course.started && !course.complete)
     if (filter === 'concluidas') return courses.filter((course) => course.complete)
     if (filter === 'iniciar') return courses.filter((course) => !course.started)
     return courses

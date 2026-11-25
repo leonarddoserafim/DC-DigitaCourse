@@ -10,7 +10,11 @@ const courseIcons = {
 export default function CourseCard({ course, featured = false }) {
   const Icon = courseIcons[course.id] ?? BookOpen
   const status = course.complete ? 'Concluída' : course.started ? 'Em andamento' : 'Não iniciada'
-  const cta = course.complete ? 'Revisar trilha' : course.started ? 'Continuar trilha' : 'Começar trilha'
+  const cta = course.complete
+    ? 'Revisar trilha'
+    : course.started
+      ? 'Continuar trilha'
+      : 'Começar trilha'
 
   return (
     <article

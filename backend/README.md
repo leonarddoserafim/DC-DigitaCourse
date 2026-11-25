@@ -2,7 +2,7 @@
 
 API Spring Boot do DigitaCourse. Persiste contas, catálogo, tentativas, progresso, preferências e notificações no PostgreSQL, com autenticação JWT e senhas BCrypt.
 
-A documentação da etapa está em [`docs/etapas/etapa-03-banco-de-dados.md`](../docs/etapas/etapa-03-banco-de-dados.md). A evolução pós-Etapa 03 está no [roadmap de 20 entregas](../docs/entregas/README.md), com a [Entrega 01](../docs/entregas/entrega-01-testes-de-integracao.md) concluída e a [Entrega 02](../docs/entregas/entrega-02-git-ci.md) concluída localmente, incluindo a CI.
+A documentação da etapa está em [`docs/etapas/etapa-03-banco-de-dados.md`](../docs/etapas/etapa-03-banco-de-dados.md). A evolução pós-Etapa 03 está no [roadmap de 20 entregas](../docs/entregas/README.md), com a [Entrega 01](../docs/entregas/entrega-01-testes-de-integracao.md) concluída e as [Entregas 02](../docs/entregas/entrega-02-git-ci.md) e [03](../docs/entregas/entrega-03-lint.md) concluídas localmente, incluindo CI, lint e formatação.
 
 ## Stack
 
@@ -87,7 +87,7 @@ O workflow [`.github/workflows/ci.yml`](../.github/workflows/ci.yml) roda em pus
 - executa `mvn -B test` em `backend/`;
 - publica os relatórios Surefire como artefato.
 
-O job de front-end executa `npm ci` e `npm run build` com Node.js 22. Os dois checks devem ficar verdes antes do merge.
+O job de front-end executa `npm ci`, `npm run lint`, `npm run format:check` e `npm run build` com Node.js 22. Os dois checks devem ficar verdes antes do merge.
 
 A CI ainda não foi executada no GitHub porque o repositório não foi publicado em um remoto. O procedimento de publicação e proteção da `main` está em [`CONTRIBUTING.md`](../CONTRIBUTING.md) e na [Entrega 02](../docs/entregas/entrega-02-git-ci.md).
 
@@ -172,6 +172,6 @@ src/
 - Sem refresh token, revogação, rate limiting ou verificação de e-mail.
 - Sem área administrativa.
 - JWT no `localStorage` do front-end.
-- Sem testes de front-end, lint ou cobertura mínima.
+- Sem testes de front-end ou cobertura mínima; lint e formatação do front-end são verificados na CI desde a Entrega 03.
 - A CI está configurada, mas ainda não foi executada no GitHub; publicação e proteção da `main` são passos manuais.
 - O roadmap completo está em [`docs/entregas/README.md`](../docs/entregas/README.md).

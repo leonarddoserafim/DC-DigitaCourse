@@ -50,10 +50,7 @@ export default function AuthLayout({ children }) {
             </div>
             <div className="auth-preview__keys">
               {keys.map((key) => (
-                <span
-                  key={key}
-                  className={key === 'f' || key === 'j' ? 'is-home' : ''}
-                >
+                <span key={key} className={key === 'f' || key === 'j' ? 'is-home' : ''}>
                   {key}
                 </span>
               ))}

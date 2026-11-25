@@ -1390,11 +1390,7 @@ section[id] {
   right: 34px;
   left: 34px;
   height: 1px;
-  background: repeating-linear-gradient(
-    90deg,
-    rgba(12, 31, 46, 0.22) 0 5px,
-    transparent 5px 10px
-  );
+  background: repeating-linear-gradient(90deg, rgba(12, 31, 46, 0.22) 0 5px, transparent 5px 10px);
 }
 
 .trail-map__line span {
@@ -1595,11 +1591,7 @@ section[id] {
   height: 1px;
   margin-bottom: 8px;
   margin-left: 14px;
-  background: repeating-linear-gradient(
-    90deg,
-    var(--line-strong) 0 4px,
-    transparent 4px 8px
-  );
+  background: repeating-linear-gradient(90deg, var(--line-strong) 0 4px, transparent 4px 8px);
 }
 
 .reward-visual {

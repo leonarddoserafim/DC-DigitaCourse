@@ -63,9 +63,7 @@ async function request(path, { method = 'GET', body, auth = true } = {}) {
       body: body === undefined ? undefined : JSON.stringify(body),
     })
   } catch {
-    throw new ApiError(
-      'Não foi possível conectar à API. Verifique se o back-end está em execução.',
-    )
+    throw new ApiError('Não foi possível conectar à API. Verifique se o back-end está em execução.')
   }
 
   const raw = await response.text()

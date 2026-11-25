@@ -1,6 +1,6 @@
 # Como contribuir — DigitaCourse
 
-Este documento descreve o fluxo de trabalho do DigitaCourse após a Entrega 02: versionamento, validação local, CI e revisão de mudanças.
+Este documento descreve o fluxo de trabalho do DigitaCourse após as Entregas 02 e 03: versionamento, validação local, lint, formatação, CI e revisão de mudanças.
 
 ## Pré-requisitos
 
@@ -35,17 +35,28 @@ cd backend
 mvn -B test
 
 cd ../frontend
+npm run lint
+npm run format:check
 npm run build
 ```
 
 A suíte do backend usa o banco dedicado `digitacourse_test` e restaura a conta demo antes de cada teste. Ela nunca deve apontar para o banco de desenvolvimento `digitacourse`.
+
+O front-end usa ESLint para React, hooks e acessibilidade, além de Prettier para formatação. Para corrigir automaticamente o que for seguro:
+
+```bash
+npm run lint:fix
+npm run format
+```
+
+O `.editorconfig` na raiz define charset UTF-8, LF, indentação de dois espaços e limpeza de espaços finais para os editores compatíveis.
 
 ## Modelo de branches
 
 - `main` é a branch estável e deve permanecer sempre verde.
 - Trabalhe em branches curtas criadas a partir de `main`.
 - Use nomes descritivos com prefixo: `feat/`, `fix/`, `docs/`, `test/`, `chore/` ou `ci/`.
-- Exemplos: `feat/entrega-03-lint`, `fix/login-token-expirado`, `docs/entrega-02`.
+- Exemplos: `feat/entrega-04-testes`, `fix/login-token-expirado`, `docs/entrega-02`.
 
 O projeto adota um fluxo trunk-based simplificado: branches curtas, pull requests pequenos e integração frequente em `main`.
 
@@ -74,7 +85,7 @@ Boas práticas:
 1. Atualize sua branch com `main`.
 2. Execute as validações locais do backend e do front-end.
 3. Abra o PR contra `main` e preencha o template.
-4. Aguarde os dois checks da CI: **Backend - testes de integração** e **Front-end - instalação e build**.
+4. Aguarde os dois checks da CI: **Backend - testes de integração** e **Front-end - qualidade e build**.
 5. Corrija falhas antes da revisão final.
 6. Faça o merge somente com os checks verdes. A estratégia recomendada é **Squash and merge**, seguida da exclusão da branch.
 
@@ -93,7 +104,7 @@ Jobs:
 | Check | O que valida |
 | --- | --- |
 | **Backend - testes de integração** | Sobe PostgreSQL 17 como serviço, configura JDK 21 e executa `mvn -B test` em `backend/` |
-| **Front-end - instalação e build** | Configura Node.js 22, executa `npm ci` e `npm run build` em `frontend/` |
+| **Front-end - qualidade e build** | Configura Node.js 22 e executa `npm ci`, `npm run lint`, `npm run format:check` e `npm run build` em `frontend/` |
 
 Os relatórios Surefire e o conteúdo de `frontend/dist` são publicados como artefatos por sete dias. O Maven e o npm usam cache entre execuções.
 
@@ -105,12 +116,12 @@ O repositório local já contém o workflow, mas a proteção da branch é uma c
 2. Crie uma regra para `main`.
 3. Marque **Require a pull request before merging**.
 4. Marque **Require status checks to pass before merging**.
-5. Selecione **Backend - testes de integração** e **Front-end - instalação e build**.
+5. Selecione **Backend - testes de integração** e **Front-end - qualidade e build**.
 6. Marque **Require branches to be up to date before merging**.
 7. Bloqueie force pushes e exclusão da branch.
 8. Se houver mais de uma pessoa no projeto, exija ao menos uma aprovação.
 
-Com essa configuração, uma falha de teste ou de build impede o merge. Enquanto o remoto não existir, essa proteção não pode ser comprovada.
+Com essa configuração, uma falha de teste, lint, formatação ou build impede o merge. Enquanto o remoto não existir, essa proteção não pode ser comprovada.
 
 ## Regras de código e dados
 
@@ -120,13 +131,17 @@ Com essa configuração, uma falha de teste ou de build impede o merge. Enquanto
 - Não registre senhas, tokens ou dados pessoais em logs.
 - Segredos devem vir de variáveis de ambiente. Arquivos `.env` são locais e não entram no Git.
 - Mudanças de dependência devem manter o `frontend/package-lock.json` sincronizado.
+- O front-end segue as regras de `frontend/eslint.config.js` e a formatação de `frontend/.prettierrc.json`.
+- Não desative regras de lint em massa. Exceções pontuais precisam de justificativa no código ou na documentação da entrega.
+- Evite `eslint-disable` para esconder problemas de hooks ou acessibilidade; prefira corrigir a causa.
 - Toda entrega implementada deve ganhar um documento em `docs/entregas/` e atualizar os READMEs afetados.
 
 ## Antes de abrir um PR
 
 - [ ] A mudança está no escopo de uma etapa ou entrega.
 - [ ] `mvn -B test` passa com 24/24 testes, quando o backend foi alterado.
-- [ ] `npm ci` e `npm run build` passam, quando o front-end foi alterado.
+- [ ] `npm ci`, `npm run lint` e `npm run format:check` passam, quando o front-end foi alterado.
+- [ ] `npm run build` gera o build de produção, quando o front-end foi alterado.
 - [ ] A documentação foi atualizada.
 - [ ] Não há segredos, dados locais ou artefatos de build no `git status`.
 - [ ] O PR descreve como validar e como reverter, se necessário.
@@ -139,6 +154,8 @@ Com essa configuração, uma falha de teste ou de build impede o merge. Enquanto
 | `Connection refused` no backend | Confirme o PostgreSQL em `127.0.0.1:5432` e o banco `digitacourse_test` |
 | Vite reclama da versão do Node | Use Node.js 22.12+ ou 20.19+ |
 | `npm ci` falha | Confirme que `frontend/package-lock.json` está atualizado e versionado |
+| Lint aponta erro de hook | Corrija dependências ou mova a lógica para fora do efeito; não use `eslint-disable` sem justificativa |
+| `format:check` falha | Execute `npm run format` e revise o diff antes de commitar |
 | `target` bloqueado no Windows | Feche processos Java e tente novamente; o OneDrive pode atrasar a liberação de arquivos |
 
 ## Referências
@@ -147,3 +164,4 @@ Com essa configuração, uma falha de teste ou de build impede o merge. Enquanto
 - [Roadmap de entregas](docs/entregas/README.md)
 - [Entrega 01 — testes de integração](docs/entregas/entrega-01-testes-de-integracao.md)
 - [Entrega 02 — Git e CI](docs/entregas/entrega-02-git-ci.md)
+- [Entrega 03 — lint e formatação](docs/entregas/entrega-03-lint.md)

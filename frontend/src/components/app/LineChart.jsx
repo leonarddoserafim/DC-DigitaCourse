@@ -113,7 +113,13 @@ export default function LineChart({
         ))}
 
         <g className="app-line-chart__last">
-          <rect x={Math.min(width - padding.right - 64, last.x - 32)} y={last.y - 34} width="64" height="24" rx="8" />
+          <rect
+            x={Math.min(width - padding.right - 64, last.x - 32)}
+            y={last.y - 34}
+            width="64"
+            height="24"
+            rx="8"
+          />
           <text
             x={Math.min(width - padding.right - 32, last.x)}
             y={last.y - 18}

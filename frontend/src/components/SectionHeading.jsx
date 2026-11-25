@@ -7,7 +7,10 @@ export default function SectionHeading({
   tone = 'dark',
 }) {
   return (
-    <div className={`section-heading section-heading--${align} section-heading--${tone}`} data-reveal>
+    <div
+      className={`section-heading section-heading--${align} section-heading--${tone}`}
+      data-reveal
+    >
       <span className="section-eyebrow">
         <span />
         {eyebrow}

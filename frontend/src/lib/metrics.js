@@ -78,13 +78,14 @@ export function computeStats(attempts = [], completedLessons = []) {
   const previousWpm = average(previousTen.map((attempt) => attempt.wpm))
   const previousAccuracy = average(previousTen.map((attempt) => attempt.accuracy))
   const todaySeconds = today.reduce((total, attempt) => total + (attempt.durationSeconds || 0), 0)
-  const weeklySeconds = lastSeven.reduce((total, attempt) => total + (attempt.durationSeconds || 0), 0)
+  const weeklySeconds = lastSeven.reduce(
+    (total, attempt) => total + (attempt.durationSeconds || 0),
+    0,
+  )
   const monthlyXp = lastThirty.reduce((total, attempt) => total + (attempt.xp || 0), 0)
   const weeklyXp = lastSeven.reduce((total, attempt) => total + (attempt.xp || 0), 0)
   const bestWpm = ordered.length ? Math.max(...ordered.map((attempt) => attempt.wpm)) : 0
-  const bestAccuracy = ordered.length
-    ? Math.max(...ordered.map((attempt) => attempt.accuracy))
-    : 0
+  const bestAccuracy = ordered.length ? Math.max(...ordered.map((attempt) => attempt.accuracy)) : 0
 
   return {
     attempts: ordered.length,
@@ -153,7 +154,8 @@ export function getNextLesson(coursesWithProgress = []) {
   const inProgress = coursesWithProgress.find((course) => course.started && !course.complete)
   const notStarted = coursesWithProgress.find((course) => !course.started)
   const remaining = coursesWithProgress.find((course) => !course.complete)
-  const selected = inProgress ?? notStarted ?? remaining ?? coursesWithProgress[coursesWithProgress.length - 1]
+  const selected =
+    inProgress ?? notStarted ?? remaining ?? coursesWithProgress[coursesWithProgress.length - 1]
 
   return {
     course: selected,
@@ -172,7 +174,7 @@ export function isLessonUnlocked(lessonId, completedLessons = []) {
   return completedLessons.includes(entries[index - 1].id)
 }
 
-export function buildAchievements({ attempts, completedLessons, coursesWithProgress, stats }) {
+export function buildAchievements({ attempts, coursesWithProgress, stats }) {
   const maxCoursePercent = Math.max(0, ...coursesWithProgress.map((course) => course.percent))
   const startedCourses = coursesWithProgress.filter((course) => course.started).length
 
@@ -276,9 +278,10 @@ export function getLast7Days(attempts = []) {
     const date = new Date(today)
     date.setDate(today.getDate() - (6 - index))
     const key = dayKey(date)
-    const minutes = attempts
-      .filter((attempt) => dayKey(attempt.createdAt) === key)
-      .reduce((total, attempt) => total + (attempt.durationSeconds || 0), 0) / 60
+    const minutes =
+      attempts
+        .filter((attempt) => dayKey(attempt.createdAt) === key)
+        .reduce((total, attempt) => total + (attempt.durationSeconds || 0), 0) / 60
 
     return {
       key,
@@ -299,9 +302,10 @@ export function getHeatmap(attempts = [], weeks = 8) {
     const date = new Date(start)
     date.setDate(start.getDate() + index)
     const key = dayKey(date)
-    const minutes = attempts
-      .filter((attempt) => dayKey(attempt.createdAt) === key)
-      .reduce((total, attempt) => total + (attempt.durationSeconds || 0), 0) / 60
+    const minutes =
+      attempts
+        .filter((attempt) => dayKey(attempt.createdAt) === key)
+        .reduce((total, attempt) => total + (attempt.durationSeconds || 0), 0) / 60
 
     let level = 0
     if (minutes > 0) level = 1
@@ -321,10 +325,9 @@ export function getHeatmap(attempts = [], weeks = 8) {
 
 export function buildChallenges({ attempts, stats, dailyGoalMinutes = 10, nextLesson = null }) {
   const today = attempts.filter((attempt) => isToday(attempt.createdAt))
-  const todayMinutes = today.reduce((total, attempt) => total + (attempt.durationSeconds || 0), 0) / 60
-  const todayBestAccuracy = today.length
-    ? Math.max(...today.map((attempt) => attempt.accuracy))
-    : 0
+  const todayMinutes =
+    today.reduce((total, attempt) => total + (attempt.durationSeconds || 0), 0) / 60
+  const todayBestAccuracy = today.length ? Math.max(...today.map((attempt) => attempt.accuracy)) : 0
   const weekAttempts = getAttemptsInLastDays(attempts, 7)
   const weekActiveDays = new Set(weekAttempts.map((attempt) => dayKey(attempt.createdAt))).size
   const weekLessons = new Set(weekAttempts.map((attempt) => attempt.lessonId)).size

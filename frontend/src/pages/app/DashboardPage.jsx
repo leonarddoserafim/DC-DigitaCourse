@@ -50,11 +50,12 @@ export default function DashboardPage() {
   const weeklyTotal = Math.round(weeklyActivity.reduce((total, day) => total + day.minutes, 0))
   const dailyChallenge = challenges[0]
   const earned = achievements.filter((achievement) => achievement.unlocked)
-  const previewAchievements = [...earned, ...achievements.filter((item) => !item.unlocked)].slice(0, 3)
+  const previewAchievements = [...earned, ...achievements.filter((item) => !item.unlocked)].slice(
+    0,
+    3,
+  )
   const recentAttempts = attempts.slice(0, 4)
-  const practiceHref = nextLessonInfo
-    ? `/app/praticar/${nextLessonInfo.lesson.id}`
-    : '/app/trilhas'
+  const practiceHref = nextLessonInfo ? `/app/praticar/${nextLessonInfo.lesson.id}` : '/app/trilhas'
 
   return (
     <div className="app-page dashboard-page">
@@ -306,7 +307,9 @@ export default function DashboardPage() {
           <div className="app-panel__head">
             <div>
               <span className="app-eyebrow">Conquistas</span>
-              <h2>{earned.length} de {achievements.length} desbloqueadas</h2>
+              <h2>
+                {earned.length} de {achievements.length} desbloqueadas
+              </h2>
             </div>
             <Link className="app-panel__link" to="/app/conquistas">
               Ver mural
@@ -321,7 +324,9 @@ export default function DashboardPage() {
                 key={achievement.id}
                 to="/app/conquistas"
               >
-                <span className={`achievement-mini__icon achievement-mini__icon--${achievement.tone}`}>
+                <span
+                  className={`achievement-mini__icon achievement-mini__icon--${achievement.tone}`}
+                >
                   <AppIcon name={achievement.icon} size={19} />
                 </span>
                 <span>

@@ -84,7 +84,6 @@ export default function LoginPage() {
                 onChange={handleChange}
                 placeholder="voce@exemplo.com"
                 autoComplete="email"
-                autoFocus
                 required
                 aria-invalid={Boolean(error)}
               />

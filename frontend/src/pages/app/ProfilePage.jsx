@@ -30,16 +30,8 @@ import {
 const goalOptions = [5, 10, 15, 20]
 
 export default function ProfilePage() {
-  const {
-    user,
-    prefs,
-    stats,
-    courses,
-    updateProfile,
-    resetProgress,
-    restoreDemo,
-    logout,
-  } = useApp()
+  const { user, prefs, stats, courses, updateProfile, resetProgress, restoreDemo, logout } =
+    useApp()
   const { showToast } = useToast()
   const navigate = useNavigate()
 
@@ -56,7 +48,10 @@ export default function ProfilePage() {
   const [dangerAction, setDangerAction] = useState(null)
   const [dangerLoading, setDangerLoading] = useState(false)
 
-  usePageMeta('Perfil e ajustes — DigitaCourse', 'Gerencie seus dados, metas e preferências da sua conta.')
+  usePageMeta(
+    'Perfil e ajustes — DigitaCourse',
+    'Gerencie seus dados, metas e preferências da sua conta.',
+  )
 
   useEffect(() => {
     setForm({
@@ -66,7 +61,14 @@ export default function ProfilePage() {
       emailReminders: prefs.emailReminders ?? true,
       weeklySummary: prefs.weeklySummary ?? true,
     })
-  }, [user?.id, user?.name, prefs.dailyGoalMinutes, prefs.publicProfile, prefs.emailReminders, prefs.weeklySummary])
+  }, [
+    user?.id,
+    user?.name,
+    prefs.dailyGoalMinutes,
+    prefs.publicProfile,
+    prefs.emailReminders,
+    prefs.weeklySummary,
+  ])
 
   const updateField = (field, value) => {
     setForm((current) => ({ ...current, [field]: value }))
@@ -121,7 +123,10 @@ export default function ProfilePage() {
         setError(result.error)
         return
       }
-      showToast('Conta demo restaurada', 'Você voltou para a conta de demonstração com os dados completos.')
+      showToast(
+        'Conta demo restaurada',
+        'Você voltou para a conta de demonstração com os dados completos.',
+      )
       navigate('/app')
     }
     setDangerAction(null)
@@ -136,7 +141,8 @@ export default function ProfilePage() {
   const completedCourses = courses.filter((course) => course.complete).length
   const overallPercent = courses.length
     ? Math.round(
-        (stats.lessonsCompleted / courses.reduce((total, course) => total + course.totalLessons, 0)) *
+        (stats.lessonsCompleted /
+          courses.reduce((total, course) => total + course.totalLessons, 0)) *
           100,
       )
     : 0
@@ -213,8 +219,8 @@ export default function ProfilePage() {
             <div>
               <strong>Seus dados ficam na sua conta.</strong>
               <p>
-                Conta, preferências e progresso são salvos no PostgreSQL e acessados pela API
-                Spring Boot com uma sessão JWT.
+                Conta, preferências e progresso são salvos no PostgreSQL e acessados pela API Spring
+                Boot com uma sessão JWT.
               </p>
             </div>
             <Link className="app-panel__link" to="/app/ranking">
@@ -268,7 +274,9 @@ export default function ProfilePage() {
                   <Mail size={17} />
                   <input type="email" value={user?.email ?? ''} readOnly disabled />
                 </span>
-                <span className="field__hint">O e-mail é a chave da conta e não pode ser alterado.</span>
+                <span className="field__hint">
+                  O e-mail é a chave da conta e não pode ser alterado.
+                </span>
               </label>
             </div>
 
@@ -277,7 +285,11 @@ export default function ProfilePage() {
                 <span className="field__label">Meta diária de prática</span>
                 <p>Escolha um tempo que caiba na sua rotina. Sessões curtas também contam.</p>
               </div>
-              <div className="profile-goal__options" role="group" aria-label="Meta diária de prática">
+              <div
+                className="profile-goal__options"
+                role="group"
+                aria-label="Meta diária de prática"
+              >
                 {goalOptions.map((minutes) => (
                   <button
                     key={minutes}
@@ -320,15 +332,12 @@ export default function ProfilePage() {
                 </span>
                 <span className="profile-toggle__copy">
                   <strong>Meta diária ativa</strong>
-                  <small>Exibir a meta de {form.dailyGoalMinutes} minutos no topo da área do aluno.</small>
+                  <small>
+                    Exibir a meta de {form.dailyGoalMinutes} minutos no topo da área do aluno.
+                  </small>
                 </span>
                 <span className="switch">
-                  <input
-                    type="checkbox"
-                    checked
-                    readOnly
-                    aria-label="Meta diária sempre ativa"
-                  />
+                  <input type="checkbox" checked readOnly aria-label="Meta diária sempre ativa" />
                   <i aria-hidden="true" />
                 </span>
               </label>
@@ -357,7 +366,9 @@ export default function ProfilePage() {
                 </span>
                 <span className="profile-toggle__copy">
                   <strong>Lembretes por e-mail</strong>
-                  <small>Avisos de prática e metas. O envio de e-mail ainda não está habilitado.</small>
+                  <small>
+                    Avisos de prática e metas. O envio de e-mail ainda não está habilitado.
+                  </small>
                 </span>
                 <span className="switch">
                   <input
@@ -422,7 +433,9 @@ export default function ProfilePage() {
               <div className="profile-danger__row">
                 <span>
                   <strong>Restaurar conta de demonstração</strong>
-                  <small>Volta para a conta da Marina com 21 tentativas e progresso de exemplo.</small>
+                  <small>
+                    Volta para a conta da Marina com 21 tentativas e progresso de exemplo.
+                  </small>
                 </span>
                 <button
                   className="btn btn--outline btn--sm"

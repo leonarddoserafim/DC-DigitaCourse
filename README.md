@@ -2,7 +2,7 @@
 
 Plataforma de treinamento de digitação criada para transformar velocidade e precisão em confiança no dia a dia. O projeto é acadêmico, desenvolvido no contexto da Fatec Praia Grande (Baixada Santista/SP), e está sendo construído por etapas.
 
-> **Status atual:** Etapa 03 concluída e Entregas 01 e 02 do roadmap entregues — testes de integração da API, repositório Git com higiene e CI de backend/front-end. A publicação no GitHub e a proteção da branch `main` são passos manuais pendentes.
+> **Status atual:** Etapa 03 concluída e Entregas 01, 02 e 03 do roadmap entregues — testes de integração da API, repositório Git com higiene, CI de backend/front-end, lint e formatação. A publicação no GitHub e a proteção da branch `main` são passos manuais pendentes.
 
 ![Página inicial do DigitaCourse](docs/assets/etapa-01/desktop.jpg)
 
@@ -25,7 +25,8 @@ Plataforma de treinamento de digitação criada para transformar velocidade e pr
 - API com Flyway, validação, tratamento centralizado de erros e health check.
 - 24 testes de integração versionados, executados localmente e configurados na CI, com banco PostgreSQL dedicado e restauração determinística da demo.
 - Repositório Git em `main`, com `.gitignore`, `.gitattributes` e histórico inicial sem artefatos locais.
-- Pipeline no GitHub Actions com dois checks: testes do backend em PostgreSQL 17 e build do front-end em Node.js 22.
+- Pipeline no GitHub Actions com dois checks: testes do backend em PostgreSQL 17 e qualidade/build do front-end em Node.js 22.
+- ESLint 9 com regras de React, hooks e acessibilidade, Prettier, `.editorconfig` e scripts de lint e formatação no front-end.
 - Guia de contribuição com branches, Conventional Commits, pull requests e proteção planejada da `main`.
 - Interface validada em navegador real com 27 verificações e dezessete capturas da Etapa 03.
 
@@ -70,6 +71,7 @@ Em desenvolvimento, o Vite faz proxy de `/api` para a API. O token JWT é a úni
 ├── .github/
 │   ├── workflows/ci.yml             # CI de backend e front-end
 │   └── pull_request_template.md     # Checklist de revisão
+├── .editorconfig                    # Padrões de editor
 ├── .gitattributes                   # Line endings e binários
 ├── .gitignore                       # Higiene de artefatos e dados locais
 ├── backend/
@@ -105,6 +107,9 @@ Em desenvolvimento, o Vite faz proxy de `/api` para a API. O token JWT é a úni
 │   │   │   └── global.css           # Design system e landing page
 │   │   ├── App.jsx                  # Rotas e composição
 │   │   └── main.jsx                 # Router, providers e fontes
+│   ├── .prettierignore              # Arquivos fora da formatação
+│   ├── .prettierrc.json             # Regras do Prettier
+│   ├── eslint.config.js             # ESLint: React, hooks e acessibilidade
 │   ├── index.html
 │   ├── package.json
 │   └── vite.config.js               # Proxy /api
@@ -116,7 +121,8 @@ Em desenvolvimento, o Vite faz proxy de `/api` para a API. O token JWT é a úni
 │   ├── entregas/
 │   │   ├── README.md                # Roadmap de 20 entregas
 │   │   ├── entrega-01-testes-de-integracao.md
-│   │   └── entrega-02-git-ci.md
+│   │   ├── entrega-02-git-ci.md
+│   │   └── entrega-03-lint.md
 │   ├── etapas/
 │   │   ├── etapa-01-pagina-inicial.md
 │   │   ├── etapa-02-area-do-aluno.md
@@ -179,6 +185,17 @@ Acesse `http://localhost:5173`.
 
 > No PowerShell do Windows, use `npm.cmd` caso a execução de `npm.ps1` esteja bloqueada pela política de scripts.
 
+Antes de abrir um pull request, valide lint, formatação e build:
+
+```bash
+cd frontend
+npm run lint
+npm run format:check
+npm run build
+```
+
+`npm run lint:fix` e `npm run format` corrigem automaticamente o que for seguro. Os padrões estão em [`frontend/eslint.config.js`](frontend/eslint.config.js), [`frontend/.prettierrc.json`](frontend/.prettierrc.json) e [`.editorconfig`](.editorconfig).
+
 ### 4. Testes da API
 
 A suíte usa PostgreSQL real, MockMvc e o banco dedicado `digitacourse_test`. Na primeira execução:
@@ -198,7 +215,7 @@ O workflow [`.github/workflows/ci.yml`](.github/workflows/ci.yml) roda em push p
 | Check | Ambiente | Validação |
 | --- | --- | --- |
 | **Backend - testes de integração** | JDK 21 e PostgreSQL 17 de serviço | `mvn -B test` em `backend/` |
-| **Front-end - instalação e build** | Node.js 22 | `npm ci` e `npm run build` em `frontend/` |
+| **Front-end - qualidade e build** | Node.js 22 | `npm ci`, `npm run lint`, `npm run format:check` e `npm run build` em `frontend/` |
 
 Os relatórios Surefire e o conteúdo de `frontend/dist` são publicados como artefatos por sete dias. Maven e npm usam cache entre execuções para reduzir o tempo da pipeline.
 
@@ -259,6 +276,7 @@ O build do front-end é gerado em `frontend/dist`. Para publicar a SPA, o host p
 | Interface | React 18.3.1 |
 | Rotas | React Router DOM 7.18.6 |
 | Build/dev server | Vite 8.3.8 |
+| Qualidade do front-end | ESLint 9, Prettier 3 e EditorConfig |
 | Estilos | CSS puro com design tokens |
 | Estado | Context API + cliente HTTP |
 | API | Spring Boot 3.4.5 / Java 21 |
@@ -277,7 +295,7 @@ O build do front-end é gerado em `frontend/dist`. Para publicar a SPA, o host p
 - O ranking continua fictício e calculado no cliente.
 - O endpoint de restauração da demo é um atalho de desenvolvimento e deve ser protegido antes de produção.
 - O JWT fica no `localStorage` nesta etapa; uma aplicação de produção deve avaliar cookie `HttpOnly` + CSRF, refresh token e revogação de sessão.
-- Os testes de API e a CI já estão versionados; ainda faltam testes de front-end, lint, rate limiting e auditoria de acessibilidade automatizada.
+- Os testes de API, a CI, o lint e a formatação já estão versionados; ainda faltam testes de front-end, rate limiting e auditoria de acessibilidade automatizada.
 - A primeira execução remota da CI e a proteção da branch `main` dependem de publicar o repositório no GitHub.
 
 ## Documentação
@@ -286,6 +304,7 @@ O build do front-end é gerado em `frontend/dist`. Para publicar a SPA, o host p
 - [Roadmap de 20 entregas](docs/entregas/README.md)
 - [Entrega 01 — Testes de integração da API](docs/entregas/entrega-01-testes-de-integracao.md)
 - [Entrega 02 — Versionamento Git, higiene e pipeline de CI](docs/entregas/entrega-02-git-ci.md)
+- [Entrega 03 — Lint, formatação e análise estática do front-end](docs/entregas/entrega-03-lint.md)
 - [Guia de contribuição](CONTRIBUTING.md)
 - [Etapa 01 — Página inicial](docs/etapas/etapa-01-pagina-inicial.md)
 - [Etapa 02 — Área do aluno](docs/etapas/etapa-02-area-do-aluno.md)
@@ -295,7 +314,7 @@ O build do front-end é gerado em `frontend/dist`. Para publicar a SPA, o host p
 
 O plano completo, com objetivo, escopo e critérios de aceite das 20 entregas, está em [`docs/entregas/README.md`](docs/entregas/README.md). Antes da próxima entrega, falta publicar o repositório no GitHub, executar a CI e ativar a proteção da `main`. A ordem recomendada depois disso é:
 
-1. **Entregas 03 e 04:** lint, testes de componentes e E2E do front-end.
+1. **Entrega 04:** testes de componentes e E2E do front-end.
 2. **Entregas 05 e 06:** acessibilidade automatizada e contrato OpenAPI.
 3. **Entregas 07 a 11:** sessão, rate limiting, e-mail, privacidade e segredos.
 4. **Entregas 12 a 14:** observabilidade, publicação e backup.

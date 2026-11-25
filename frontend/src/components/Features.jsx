@@ -18,7 +18,8 @@ export default function Features() {
             eyebrow="Por que DigitaCourse"
             title={
               <>
-                Evoluir fica mais leve quando você <span className="soft-mark">enxerga cada passo.</span>
+                Evoluir fica mais leve quando você{' '}
+                <span className="soft-mark">enxerga cada passo.</span>
               </>
             }
             description="Uma experiência de aprendizado pensada para criar constância — não para decorar teclas."
@@ -105,7 +106,11 @@ export default function Features() {
             </div>
           </article>
 
-          <article className="feature-card feature-card--short" data-reveal style={{ '--reveal-delay': '60ms' }}>
+          <article
+            className="feature-card feature-card--short"
+            data-reveal
+            style={{ '--reveal-delay': '60ms' }}
+          >
             <div className="feature-card__top">
               <span className="icon-chip">
                 <Clock size={21} />
@@ -125,7 +130,11 @@ export default function Features() {
             </div>
           </article>
 
-          <article className="feature-card feature-card--rewards" data-reveal style={{ '--reveal-delay': '120ms' }}>
+          <article
+            className="feature-card feature-card--rewards"
+            data-reveal
+            style={{ '--reveal-delay': '120ms' }}
+          >
             <div className="feature-card__top">
               <span className="icon-chip">
                 <Trophy size={21} />
@@ -144,7 +153,11 @@ export default function Features() {
             </div>
           </article>
 
-          <article className="feature-card feature-card--wide" data-reveal style={{ '--reveal-delay': '80ms' }}>
+          <article
+            className="feature-card feature-card--wide"
+            data-reveal
+            style={{ '--reveal-delay': '80ms' }}
+          >
             <div className="feature-card__wide-copy">
               <div className="feature-card__top">
                 <span className="icon-chip">

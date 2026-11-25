@@ -4,7 +4,16 @@ import PageHeader from '../../components/app/PageHeader'
 import AppIcon from '../../components/AppIcon'
 import ProgressRing from '../../components/app/ProgressRing'
 import EmptyState from '../../components/app/EmptyState'
-import { ArrowUpRight, CheckCircle, Clock, Play, Spark, Target, Trophy, Zap } from '../../components/Icons'
+import {
+  ArrowUpRight,
+  CheckCircle,
+  Clock,
+  Play,
+  Spark,
+  Target,
+  Trophy,
+  Zap,
+} from '../../components/Icons'
 import { useApp } from '../../context/AppContext'
 import usePageMeta from '../../hooks/usePageMeta'
 import { formatNumber } from '../../lib/format'
@@ -36,9 +45,7 @@ export default function ChallengesPage() {
           100,
       )
     : 0
-  const practiceHref = nextLessonInfo
-    ? `/app/praticar/${nextLessonInfo.lesson.id}`
-    : '/app/trilhas'
+  const practiceHref = nextLessonInfo ? `/app/praticar/${nextLessonInfo.lesson.id}` : '/app/trilhas'
 
   const filtered = useMemo(() => {
     if (filter === 'todos') return challenges
@@ -85,7 +92,9 @@ export default function ChallengesPage() {
             </span>
             <span>
               <Clock size={16} />
-              <strong>{stats.todaySeconds > 0 ? Math.round(stats.todaySeconds / 60) : 0} min</strong>
+              <strong>
+                {stats.todaySeconds > 0 ? Math.round(stats.todaySeconds / 60) : 0} min
+              </strong>
               praticados hoje
             </span>
           </div>
@@ -128,7 +137,11 @@ export default function ChallengesPage() {
           title="Nenhum desafio neste filtro"
           description="Escolha outro período ou volte para todos os desafios."
           action={
-            <button className="btn btn--primary btn--sm" type="button" onClick={() => setFilter('todos')}>
+            <button
+              className="btn btn--primary btn--sm"
+              type="button"
+              onClick={() => setFilter('todos')}
+            >
               Ver todos
             </button>
           }
@@ -173,7 +186,10 @@ export default function ChallengesPage() {
                 </div>
 
                 <div className="challenge-card__foot">
-                  <Link className="challenge-card__link" to={challenge.lessonId ? `/app/praticar/${challenge.lessonId}` : practiceHref}>
+                  <Link
+                    className="challenge-card__link"
+                    to={challenge.lessonId ? `/app/praticar/${challenge.lessonId}` : practiceHref}
+                  >
                     {challenge.complete ? 'Continuar praticando' : 'Avançar neste desafio'}
                     <ArrowUpRight size={15} />
                   </Link>

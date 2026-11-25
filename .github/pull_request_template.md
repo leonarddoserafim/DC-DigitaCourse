@@ -13,7 +13,7 @@
 
 ## Entrega ou etapa relacionada
 
-<!-- Ex.: Entrega 02 — Versionamento Git, higiene e pipeline de CI -->
+<!-- Ex.: Entrega 03 — Lint, formatação e análise estática do front-end -->
 
 ## Como validar
 
@@ -23,7 +23,8 @@
 
 - [ ] A mudança está limitada ao escopo descrito.
 - [ ] `mvn -B test` passa no backend, quando aplicável.
-- [ ] `npm ci` e `npm run build` passam no front-end, quando aplicável.
+- [ ] `npm ci`, `npm run lint` e `npm run format:check` passam no front-end, quando aplicável.
+- [ ] `npm run build` gera o build de produção, quando aplicável.
 - [ ] A interface continua responsiva e em pt-BR, quando aplicável.
 - [ ] A documentação própria da entrega foi criada ou atualizada.
 - [ ] Nenhum segredo, `.env`, banco local, log ou dependência instalada foi versionado.

@@ -21,7 +21,7 @@ import SignupPage from './pages/auth/SignupPage'
 
 export default function App() {
   const location = useLocation()
-  useReveal([location.pathname])
+  useReveal(location.pathname)
 
   return (
     <>

@@ -7,8 +7,7 @@ export default function BarChart({ data = [], goal = 10, ariaLabel }) {
       className="app-bar-chart"
       role="img"
       aria-label={
-        ariaLabel ??
-        `Atividade dos últimos sete dias: ${Math.round(total)} minutos no total.`
+        ariaLabel ?? `Atividade dos últimos sete dias: ${Math.round(total)} minutos no total.`
       }
     >
       {data.map((item) => {

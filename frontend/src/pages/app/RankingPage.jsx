@@ -2,7 +2,16 @@ import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import PageHeader from '../../components/app/PageHeader'
 import AppIcon from '../../components/AppIcon'
-import { ArrowUpRight, CheckCircle, EyeOff, Flame, Star, Trophy, Users, Zap } from '../../components/Icons'
+import {
+  ArrowUpRight,
+  CheckCircle,
+  EyeOff,
+  Flame,
+  Star,
+  Trophy,
+  Users,
+  Zap,
+} from '../../components/Icons'
 import { useApp } from '../../context/AppContext'
 import { rankingUsers } from '../../data/community'
 import usePageMeta from '../../hooks/usePageMeta'
@@ -56,7 +65,11 @@ export default function RankingPage() {
       />
 
       <div className="ranking-toolbar" data-reveal>
-        <div className="app-segmented app-segmented--lg" role="group" aria-label="Período do ranking">
+        <div
+          className="app-segmented app-segmented--lg"
+          role="group"
+          aria-label="Período do ranking"
+        >
           {periods.map((item) => (
             <button
               key={item.id}
@@ -144,7 +157,9 @@ export default function RankingPage() {
                   {ranking.map((entry) => (
                     <tr key={entry.id} className={entry.isCurrent ? 'is-current' : ''}>
                       <td>
-                        <span className={`ranking-table__position${entry.position <= 3 ? ' is-top' : ''}`}>
+                        <span
+                          className={`ranking-table__position${entry.position <= 3 ? ' is-top' : ''}`}
+                        >
                           {entry.position}
                         </span>
                       </td>
@@ -166,7 +181,9 @@ export default function RankingPage() {
                       <td>{entry.wpm} WPM</td>
                       <td>{formatNumber(entry.accuracy, 1)}%</td>
                       <td>
-                        <strong className="ranking-table__score">{formatNumber(entry.score)} XP</strong>
+                        <strong className="ranking-table__score">
+                          {formatNumber(entry.score)} XP
+                        </strong>
                       </td>
                     </tr>
                   ))}
@@ -189,7 +206,8 @@ export default function RankingPage() {
               <>
                 <strong className="ranking-you__position">{current.position}º</strong>
                 <p>
-                  entre {ranking.length} participantes no período <strong>{activePeriod.label.toLowerCase()}</strong>.
+                  entre {ranking.length} participantes no período{' '}
+                  <strong>{activePeriod.label.toLowerCase()}</strong>.
                 </p>
                 <div className="ranking-you__stats">
                   <span>
@@ -206,8 +224,8 @@ export default function RankingPage() {
                     <>
                       <span>Próximo degrau</span>
                       <strong>
-                        {formatNumber(ranking[current.position - 2].score - current.score)} XP atrás de{' '}
-                        {ranking[current.position - 2].name.split(' ')[0]}
+                        {formatNumber(ranking[current.position - 2].score - current.score)} XP atrás
+                        de {ranking[current.position - 2].name.split(' ')[0]}
                       </strong>
                     </>
                   ) : (
@@ -249,8 +267,8 @@ export default function RankingPage() {
                   <CheckCircle size={16} />
                 </span>
                 <p>
-                  <strong>Lição concluída</strong>
-                  O XP da lição entra no seu total, com bônus por precisão acima de 98%.
+                  <strong>Lição concluída</strong>O XP da lição entra no seu total, com bônus por
+                  precisão acima de 98%.
                 </p>
               </li>
               <li>

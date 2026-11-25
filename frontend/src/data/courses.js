@@ -43,7 +43,8 @@ export const courses = [
           {
             id: 'fund-03',
             title: 'Home row sem olhar',
-            description: 'Una as teclas da home row em palavras curtas e mantenha um ritmo constante.',
+            description:
+              'Una as teclas da home row em palavras curtas e mantenha um ritmo constante.',
             duration: 5,
             xp: 55,
             focus: 'Ritmo',

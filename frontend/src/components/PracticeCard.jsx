@@ -95,7 +95,6 @@ export default function PracticeCard() {
           </div>
         </div>
       </div>
-
     </div>
   )
 }

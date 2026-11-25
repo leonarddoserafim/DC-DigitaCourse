@@ -6,7 +6,16 @@ import LineChart from '../../components/app/LineChart'
 import BarChart from '../../components/app/BarChart'
 import EmptyState from '../../components/app/EmptyState'
 import AppIcon from '../../components/AppIcon'
-import { ArrowUpRight, Calendar, CheckCircle, Clock, Flame, Gauge, Play, Target, Zap } from '../../components/Icons'
+import {
+  ArrowUpRight,
+  Calendar,
+  CheckCircle,
+  Flame,
+  Gauge,
+  Play,
+  Target,
+  Zap,
+} from '../../components/Icons'
 import { useApp } from '../../context/AppContext'
 import usePageMeta from '../../hooks/usePageMeta'
 import {
@@ -31,9 +40,7 @@ export default function ProgressPage() {
     'Acompanhe velocidade, precisão, tempo de prática e histórico de exercícios.',
   )
 
-  const practiceHref = nextLessonInfo
-    ? `/app/praticar/${nextLessonInfo.lesson.id}`
-    : '/app/trilhas'
+  const practiceHref = nextLessonInfo ? `/app/praticar/${nextLessonInfo.lesson.id}` : '/app/trilhas'
   const goal = prefs.dailyGoalMinutes ?? 10
   const weeklyTotal = Math.round(weeklyActivity.reduce((total, day) => total + day.minutes, 0))
   const activeDays = weeklyActivity.filter((day) => day.minutes > 0).length
@@ -144,7 +151,10 @@ export default function ProgressPage() {
             <div className="app-panel__foot">
               <span>
                 <Gauge size={15} />
-                Melhor marca: {metric === 'wpm' ? `${stats.bestWpm} WPM` : `${formatNumber(stats.bestAccuracy, 1)}%`}
+                Melhor marca:{' '}
+                {metric === 'wpm'
+                  ? `${stats.bestWpm} WPM`
+                  : `${formatNumber(stats.bestAccuracy, 1)}%`}
               </span>
               <span>Última prática {latest ? formatRelativeTime(latest.createdAt) : '—'}</span>
             </div>
@@ -234,11 +244,12 @@ export default function ProgressPage() {
             <div>
               <span className="app-eyebrow">Ritmo da semana</span>
               <h2>{weeklyTotal} min de prática</h2>
-              <p>Meta diária de {goal} minutos · {activeDays} de 7 dias ativos.</p>
+              <p>
+                Meta diária de {goal} minutos · {activeDays} de 7 dias ativos.
+              </p>
             </div>
             <span className="progress-week__badge">
-              <Calendar size={14} />
-              7 dias
+              <Calendar size={14} />7 dias
             </span>
           </div>
           <BarChart data={weeklyActivity} goal={goal} />
@@ -276,7 +287,10 @@ export default function ProgressPage() {
           <div>
             <span className="app-eyebrow">Jornada</span>
             <h2>Progresso por trilha</h2>
-            <p>{lessonsInProgress.length} trilha em andamento · {stats.lessonsCompleted} lições concluídas.</p>
+            <p>
+              {lessonsInProgress.length} trilha em andamento · {stats.lessonsCompleted} lições
+              concluídas.
+            </p>
           </div>
           <Link className="app-panel__link" to="/app/trilhas">
             Ver trilhas

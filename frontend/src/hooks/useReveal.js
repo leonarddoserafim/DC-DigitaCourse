@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 
-export default function useReveal(deps = []) {
+export default function useReveal(dependency) {
   useEffect(() => {
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
@@ -55,5 +55,5 @@ export default function useReveal(deps = []) {
       observer.disconnect()
       mutations.disconnect()
     }
-  }, deps)
+  }, [dependency])
 }

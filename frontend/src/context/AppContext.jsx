@@ -239,12 +239,9 @@ export function AppProvider({ children }) {
     [catalog],
   )
 
-  const attempts = useMemo(
-    () => sortAttempts(account?.attempts ?? []),
-    [account],
-  )
-  const completedLessons = account?.completedLessons ?? []
-  const prefs = account?.prefs ?? {}
+  const attempts = useMemo(() => sortAttempts(account?.attempts ?? []), [account])
+  const completedLessons = useMemo(() => account?.completedLessons ?? [], [account])
+  const prefs = useMemo(() => account?.prefs ?? {}, [account])
 
   const stats = useMemo(
     () => computeStats(attempts, completedLessons),
@@ -252,25 +249,20 @@ export function AppProvider({ children }) {
   )
 
   const coursesWithProgress = useMemo(
-    () =>
-      catalog.map((course) => computeCourseProgress(course, completedLessons, attempts)),
+    () => catalog.map((course) => computeCourseProgress(course, completedLessons, attempts)),
     [catalog, attempts, completedLessons],
   )
 
-  const nextLessonInfo = useMemo(
-    () => getNextLesson(coursesWithProgress),
-    [coursesWithProgress],
-  )
+  const nextLessonInfo = useMemo(() => getNextLesson(coursesWithProgress), [coursesWithProgress])
 
   const achievements = useMemo(
     () =>
       buildAchievements({
         attempts,
-        completedLessons,
         coursesWithProgress,
         stats,
       }),
-    [attempts, completedLessons, coursesWithProgress, stats],
+    [attempts, coursesWithProgress, stats],
   )
 
   const challenges = useMemo(

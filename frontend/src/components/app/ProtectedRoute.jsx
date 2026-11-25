@@ -10,11 +10,7 @@ export default function ProtectedRoute({ children }) {
 
   if (!isAuthenticated) {
     return (
-      <Navigate
-        to="/entrar"
-        state={{ from: `${location.pathname}${location.search}` }}
-        replace
-      />
+      <Navigate to="/entrar" state={{ from: `${location.pathname}${location.search}` }} replace />
     )
   }
 

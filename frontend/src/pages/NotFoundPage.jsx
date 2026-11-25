@@ -7,7 +7,10 @@ import usePageMeta from '../hooks/usePageMeta'
 export default function NotFoundPage() {
   const { isAuthenticated } = useApp()
 
-  usePageMeta('Página não encontrada — DigitaCourse', 'O endereço acessado não existe no DigitaCourse.')
+  usePageMeta(
+    'Página não encontrada — DigitaCourse',
+    'O endereço acessado não existe no DigitaCourse.',
+  )
 
   return (
     <main className="not-found">

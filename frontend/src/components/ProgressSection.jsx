@@ -20,7 +20,8 @@ export default function ProgressSection() {
             Evolução
           </span>
           <h2 id="progress-title" data-reveal>
-            Seu esforço vira números que <span className="soft-mark soft-mark--light">fazem sentido.</span>
+            Seu esforço vira números que{' '}
+            <span className="soft-mark soft-mark--light">fazem sentido.</span>
           </h2>
           <p className="progress__lead" data-reveal>
             Nada de treinar no escuro. Acompanhe sua velocidade média, precisão e hábito de prática
@@ -191,8 +192,7 @@ export default function ProgressSection() {
                   Precisão de ouro
                 </span>
                 <span className="achievement-chip">
-                  <Flame size={14} />
-                  7 dias seguidos
+                  <Flame size={14} />7 dias seguidos
                 </span>
                 <span className="achievement-chip achievement-chip--more">+3</span>
               </div>

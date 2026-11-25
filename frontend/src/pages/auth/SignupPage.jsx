@@ -21,7 +21,10 @@ export default function SignupPage() {
   const [error, setError] = useState('')
   const [submitting, setSubmitting] = useState(false)
 
-  usePageMeta('Criar conta — DigitaCourse', 'Crie sua conta no DigitaCourse e comece sua jornada de digitação.')
+  usePageMeta(
+    'Criar conta — DigitaCourse',
+    'Crie sua conta no DigitaCourse e comece sua jornada de digitação.',
+  )
 
   const handleChange = (event) => {
     const { name, value, type, checked } = event.target
@@ -85,7 +88,6 @@ export default function SignupPage() {
                 onChange={handleChange}
                 placeholder="Como podemos chamar você?"
                 autoComplete="name"
-                autoFocus
                 required
               />
             </span>
@@ -154,23 +156,14 @@ export default function SignupPage() {
           </label>
 
           <label className="auth-check">
-            <input
-              type="checkbox"
-              name="terms"
-              checked={form.terms}
-              onChange={handleChange}
-            />
+            <input type="checkbox" name="terms" checked={form.terms} onChange={handleChange} />
             <span>
-              Concordo com os termos de uso e com o tratamento dos meus dados para esta
-              demonstração local.
+              Concordo com os termos de uso e com o tratamento dos meus dados para esta demonstração
+              local.
             </span>
           </label>
 
-          <button
-            className="btn btn--primary auth-submit"
-            type="submit"
-            disabled={submitting}
-          >
+          <button className="btn btn--primary auth-submit" type="submit" disabled={submitting}>
             {submitting ? 'Criando sua conta…' : 'Criar minha conta'}
             <span className="btn__icon" aria-hidden="true">
               <ArrowUpRight size={17} />

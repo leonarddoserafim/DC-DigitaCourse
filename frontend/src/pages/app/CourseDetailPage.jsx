@@ -155,7 +155,10 @@ export default function CourseDetailPage() {
 
                       <div className="lesson-row__action">
                         {completed && (
-                          <Link className="btn btn--outline btn--sm" to={`/app/praticar/${lesson.id}`}>
+                          <Link
+                            className="btn btn--outline btn--sm"
+                            to={`/app/praticar/${lesson.id}`}
+                          >
                             Revisar
                           </Link>
                         )}

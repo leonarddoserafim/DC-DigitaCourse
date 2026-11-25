@@ -4,7 +4,16 @@ import PageHeader from '../../components/app/PageHeader'
 import ProgressRing from '../../components/app/ProgressRing'
 import EmptyState from '../../components/app/EmptyState'
 import AppIcon from '../../components/AppIcon'
-import { ArrowUpRight, CheckCircle, Lock, Play, Spark, Star, Trophy, Zap } from '../../components/Icons'
+import {
+  ArrowUpRight,
+  CheckCircle,
+  Lock,
+  Play,
+  Spark,
+  Star,
+  Trophy,
+  Zap,
+} from '../../components/Icons'
 import { useApp } from '../../context/AppContext'
 import usePageMeta from '../../hooks/usePageMeta'
 import { formatNumber } from '../../lib/format'
@@ -31,9 +40,7 @@ export default function AchievementsPage() {
   const nextAchievement = [...achievements]
     .filter((achievement) => !achievement.unlocked)
     .sort((a, b) => b.progress - a.progress)[0]
-  const practiceHref = nextLessonInfo
-    ? `/app/praticar/${nextLessonInfo.lesson.id}`
-    : '/app/trilhas'
+  const practiceHref = nextLessonInfo ? `/app/praticar/${nextLessonInfo.lesson.id}` : '/app/trilhas'
 
   const filtered = useMemo(() => {
     if (filter === 'desbloqueadas') {

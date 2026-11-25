@@ -68,7 +68,6 @@ export default function ForgotPasswordPage() {
                     }}
                     placeholder="voce@exemplo.com"
                     autoComplete="email"
-                    autoFocus
                     required
                   />
                 </span>

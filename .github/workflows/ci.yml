@@ -67,7 +67,7 @@ jobs:
           retention-days: 7
 
   frontend:
-    name: Front-end - instalação e build
+    name: Front-end - qualidade e build
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
@@ -85,6 +85,14 @@ jobs:
       - name: Instalar dependências
         working-directory: frontend
         run: npm ci
+
+      - name: Verificar lint
+        working-directory: frontend
+        run: npm run lint
+
+      - name: Verificar formatação
+        working-directory: frontend
+        run: npm run format:check
 
       - name: Gerar build de produção
         working-directory: frontend
