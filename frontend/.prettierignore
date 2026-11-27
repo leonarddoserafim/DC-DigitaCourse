@@ -3,3 +3,7 @@ dist
 coverage
 package-lock.json
 public
+playwright-report
+test-results
+blob-report
+playwright/.cache

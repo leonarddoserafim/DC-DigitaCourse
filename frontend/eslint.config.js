@@ -7,7 +7,15 @@ import globals from 'globals'
 
 export default [
   {
-    ignores: ['dist/**', 'node_modules/**', 'coverage/**'],
+    ignores: [
+      'dist/**',
+      'node_modules/**',
+      'coverage/**',
+      'playwright-report/**',
+      'test-results/**',
+      'blob-report/**',
+      'playwright/.cache/**',
+    ],
   },
   js.configs.recommended,
   {
@@ -45,9 +53,19 @@ export default [
     },
   },
   {
-    files: ['eslint.config.js', 'vite.config.js'],
+    files: [
+      'eslint.config.js',
+      'vite.config.js',
+      'vitest.config.js',
+      'playwright.config.js',
+      'e2e/**/*.js',
+    ],
     languageOptions: {
       globals: globals.node,
+    },
+    rules: {
+      // Os fixtures do Playwright usam o parâmetro `use`, que não é um hook do React.
+      'react-hooks/rules-of-hooks': 'off',
     },
   },
   prettier,
